@@ -1,0 +1,36 @@
+#blender-container {
+	/* display       : flex;
+	flex-direction: column; */
+	margin-top: 2rem;
+}
+
+.blender-series {
+	/* display       : flex;
+	flex-direction: column; */
+	margin-bottom: 2rem;
+
+	padding: 1rem;
+
+	background: rgb(231, 236, 226);
+}
+
+.blender-series:hover {
+	background: rgb(121, 118, 118);
+	color     : white;
+	transform : scale(1.02);
+
+}
+
+/* .blender-series-body {
+	display       : flex;
+	flex-direction: row;
+	flex-wrap     : wrap;
+} */
+
+/* .blender-series-description {
+	margin: auto;
+} */
+
+.blender-series-thumbnail {
+	margin-right: 1rem;
+}
