@@ -55,28 +55,17 @@ impl NodeExt for BlenderSeries {
         let thumbnail_classes = "blender-series-thumbnail rounded";
 
         Div.class("blender-series rounded ease link-reset").kid(
-            A::href(&self.path).kid(H2.text(self.series.name)).kid(
-                Div.class("flex-row")
-                    .kid(P.text(self.series.description).class("margin-auto"))
+            A::href(&self.path).kid(
+                Div.class("grid-4")
+                    .kid(H2.text(self.series.name))
+                    .kid(P.text(self.series.description))
                     .kid(
-                        // Thumbnails wrapped in a single div such that
-                        // they flex-wrap together.
-                        Div.kid(
-                            Img::new_sized(
-                                &content.image(&self.series.before_after.before),
-                                THUMBNAIL_WIDTH,
-                                THUMBNAIL_HEIGHT,
-                            )
+                        Img::new(&content.image(&self.series.before_after.before))
                             .class(thumbnail_classes),
-                        )
-                        .kid(
-                            Img::new_sized(
-                                &content.image(&self.series.before_after.after),
-                                THUMBNAIL_WIDTH,
-                                THUMBNAIL_HEIGHT,
-                            )
+                    )
+                    .kid(
+                        Img::new(&content.image(&self.series.before_after.after))
                             .class(thumbnail_classes),
-                        ),
                     ),
             ),
         )
@@ -183,7 +172,7 @@ pub async fn landing(
         .kid(Br)
         .kid(P.text("I might log work from following paid tutorials, youtube videos, or just doodling."))
         .kid(P.text("The point anyway is to have something to look back at in the future, and to not take learning Blender too seriously."))
-        .kid(Div.id("blender-container").kid(tut1));
+        .kid(Div.class("breather-y").kid(tut1));
 
     // for fake_tutorial in 0..10 {
     //     contents.push_kid(BlenderSeries::new(
