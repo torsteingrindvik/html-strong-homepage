@@ -51,22 +51,21 @@ impl NodeExt for BlenderSeries {
         let content = ContentUrl::new(Base::Blender);
         let thumbnail_classes = "blender-series-thumbnail rounded";
 
-        Div.class("blender-series padding rounded ease link-reset")
-            .kid(
-                A::href(&self.path).kid(
-                    Div.class("grid-4")
-                        .kid(H2.text(self.series.name))
-                        .kid(P.text(self.series.description))
-                        .kid(
-                            Img::new(&content.image(&self.series.before_after.before))
-                                .class(thumbnail_classes),
-                        )
-                        .kid(
-                            Img::new(&content.image(&self.series.before_after.after))
-                                .class(thumbnail_classes),
-                        ),
-                ),
-            )
+        Div.class("card-bg padding rounded ease link-reset").kid(
+            A::href(&self.path).kid(
+                Div.class("grid-4")
+                    .kid(H2.text(self.series.name))
+                    .kid(P.text(self.series.description))
+                    .kid(
+                        Img::new(&content.image(&self.series.before_after.before))
+                            .class(thumbnail_classes),
+                    )
+                    .kid(
+                        Img::new(&content.image(&self.series.before_after.after))
+                            .class(thumbnail_classes),
+                    ),
+            ),
+        )
     }
 }
 
@@ -136,7 +135,8 @@ pub fn blender() -> Router {
 }
 
 pub async fn series(Path(series): Path<String>) -> Result<Html<String>, (StatusCode, String)> {
-    let url = ContentUrl::new_with_subpage(Base::Blender, &series);
+    let mut url = ContentUrl::new(Base::Blender);
+    url.dive(&series);
 
     blender_page(H1.text(&format!("Yah: {}", url.url()))).await
 }

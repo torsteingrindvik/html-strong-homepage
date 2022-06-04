@@ -36,7 +36,8 @@ pub async fn home() -> Result<Html<String>, (StatusCode, String)> {
         ))
         .kid(Entry::new(
             "Bus 🚍",
-            "This is just a shortcut for me to quickly check when the bus comes and goes.",
+            "This is just a shortcut for me to quickly check when the bus comes and goes.
+            HAH! Just kidding, I bought a car before I implemented this.",
         ))
         .kid(Entry::new(
             "Blender ⛰️",

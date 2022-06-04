@@ -11,7 +11,7 @@ use tower_http::{
 };
 
 use html_strong_homepage::{
-    blender, common::internal_server_error, home, training, Base, ContentUrl,
+    blender, blog, common::internal_server_error, home, training, Base, ContentUrl,
 };
 
 #[tokio::main]
@@ -19,12 +19,14 @@ pub async fn main() {
     tracing_subscriber::fmt::init();
 
     let content_home = ContentUrl::new(Base::Home);
+    let content_blog = ContentUrl::new(Base::Blog);
     let content_blender = ContentUrl::new(Base::Blender);
     let content_training = ContentUrl::new(Base::Training);
 
     let app = Router::new()
         .route(&content_home.url(), get(home::home))
         .nest(&content_blender.url(), blender::blender())
+        .nest(&content_blog.url(), blog::blog())
         .route(&content_training.url(), get(training::training))
         .route(
             "/favicon.ico",

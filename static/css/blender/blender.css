@@ -12,17 +12,6 @@
 	}
 }
 
-.blender-series {
-	background: rgb(231, 236, 226);
-}
-
-.blender-series:hover {
-	background: rgb(121, 118, 118);
-	color     : white;
-	transform : scale(1.02);
-
-}
-
 .blender-series-thumbnail {
 	max-width: 320px;
 	width    : 100%;
