@@ -1,10 +1,18 @@
+.blender-series-header {
+	display    : grid;
+	place-items: center;
+
+	grid: 1fr 1fr / 1fr 1fr;
+	gap : 1rem;
+}
+
+@media (max-width: 1000px) {
+	.blender-series-header {
+		grid: 0.5fr 0.5fr 1fr 1fr / 1fr;
+	}
+}
+
 .blender-series {
-	/* display       : flex;
-	flex-direction: column; */
-	margin-bottom: 2rem;
-
-	padding: 1rem;
-
 	background: rgb(231, 236, 226);
 }
 
@@ -14,16 +22,6 @@
 	transform : scale(1.02);
 
 }
-
-/* .blender-series-body {
-	display       : flex;
-	flex-direction: row;
-	flex-wrap     : wrap;
-} */
-
-/* .blender-series-description {
-	margin: auto;
-} */
 
 .blender-series-thumbnail {
 	max-width: 320px;

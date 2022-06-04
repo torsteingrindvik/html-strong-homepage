@@ -22,6 +22,7 @@ pub enum Base {
     Blog,
     Bus,
     Blender,
+    Training,
 }
 
 impl Display for Base {
@@ -32,6 +33,7 @@ impl Display for Base {
             Base::Shared => "shared",
             Base::Blog => "blog",
             Base::Bus => "bus",
+            Base::Training => "training",
         };
 
         write!(f, "{s}")
@@ -97,3 +99,4 @@ pub mod blender;
 pub mod blog;
 pub mod bus;
 pub mod home;
+pub mod training;

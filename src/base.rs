@@ -61,7 +61,8 @@ pub fn html_doc<S: AsRef<str>>(
         .kid(A::href(&ContentUrl::new(Base::Home).url()).text("Home 🏠"))
         .kid(A::href(&ContentUrl::new(Base::Blog).url()).text("Blog 📚"))
         .kid(A::href(&ContentUrl::new(Base::Bus).url()).text("Bus 🚍"))
-        .kid(A::href(&ContentUrl::new(Base::Blender).url()).text("Blender ⛰️"));
+        .kid(A::href(&ContentUrl::new(Base::Blender).url()).text("Blender ⛰️"))
+        .kid(A::href(&ContentUrl::new(Base::Training).url()).text("Training 🏋️"));
 
     let footer = Footer.kid(
         Div.kid(P.text("Made using "))
@@ -71,7 +72,7 @@ pub fn html_doc<S: AsRef<str>>(
     let body = Body
         .id("container")
         .kid(nav.class("base-nav"))
-        .kid(body.class("base-body"))
+        .kid(body.class("base-body breather-y"))
         .kid(footer.class("base-footer"));
 
     template::HtmlDocumentBuilder::new()

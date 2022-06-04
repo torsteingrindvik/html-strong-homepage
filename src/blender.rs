@@ -13,9 +13,6 @@ use crate::base::html_doc;
 use crate::common::render;
 use crate::{Base, ContentUrl};
 
-const THUMBNAIL_WIDTH: usize = 320;
-const THUMBNAIL_HEIGHT: usize = 180;
-
 #[derive(Debug, Clone)]
 struct BeforeAfterImages {
     before: String,
@@ -54,21 +51,22 @@ impl NodeExt for BlenderSeries {
         let content = ContentUrl::new(Base::Blender);
         let thumbnail_classes = "blender-series-thumbnail rounded";
 
-        Div.class("blender-series rounded ease link-reset").kid(
-            A::href(&self.path).kid(
-                Div.class("grid-4")
-                    .kid(H2.text(self.series.name))
-                    .kid(P.text(self.series.description))
-                    .kid(
-                        Img::new(&content.image(&self.series.before_after.before))
-                            .class(thumbnail_classes),
-                    )
-                    .kid(
-                        Img::new(&content.image(&self.series.before_after.after))
-                            .class(thumbnail_classes),
-                    ),
-            ),
-        )
+        Div.class("blender-series padding rounded ease link-reset")
+            .kid(
+                A::href(&self.path).kid(
+                    Div.class("grid-4")
+                        .kid(H2.text(self.series.name))
+                        .kid(P.text(self.series.description))
+                        .kid(
+                            Img::new(&content.image(&self.series.before_after.before))
+                                .class(thumbnail_classes),
+                        )
+                        .kid(
+                            Img::new(&content.image(&self.series.before_after.after))
+                                .class(thumbnail_classes),
+                        ),
+                ),
+            )
     }
 }
 
@@ -85,35 +83,22 @@ impl BlenderSeriesHeader {
 impl NodeExt for BlenderSeriesHeader {
     fn into_node(self) -> Node {
         let content = ContentUrl::new(Base::Blender);
-        let thumbnail_classes = "blender-series-thumbnail rounded margin-auto";
+        let thumbnail_classes = "blender-series-thumbnail rounded";
 
-        Div.kid(H2.text(self.series.name).class("text-center"))
-            .kid(
-                Div.class("flex-column")
-                    .kid(Em.text(self.series.description).class("breather-y"))
-                    .kid(
-                        // Thumbnails wrapped in a single div such that
-                        // they flex-wrap together.
-                        Div.class("flex-row flex-wrap")
-                            .kid(
-                                Img::new_sized(
-                                    &content.image(&self.series.before_after.before),
-                                    THUMBNAIL_WIDTH,
-                                    THUMBNAIL_HEIGHT,
-                                )
-                                .class(thumbnail_classes),
-                            )
-                            .kid(
-                                Img::new_sized(
-                                    &content.image(&self.series.before_after.after),
-                                    THUMBNAIL_WIDTH,
-                                    THUMBNAIL_HEIGHT,
-                                )
-                                .class(thumbnail_classes),
-                            ),
-                    ),
-            )
-            .kid(Hr.class("breather-y"))
+        Div.kid(
+            Div.class("blender-series-header")
+                .kid(H2.text(self.series.name))
+                .kid(Em.text(self.series.description))
+                .kid(
+                    Img::new(&content.image(&self.series.before_after.before))
+                        .class(thumbnail_classes),
+                )
+                .kid(
+                    Img::new(&content.image(&self.series.before_after.after))
+                        .class(thumbnail_classes),
+                ),
+        )
+        .kid(Hr.class("breather-y"))
     }
 }
 
@@ -170,8 +155,13 @@ pub async fn landing(
         .kid(H1.text("Blender Work Logs"))
         .kid(P.text("Here follows my work logs (e.g. in-progress images and such)."))
         .kid(Br)
-        .kid(P.text("I might log work from following paid tutorials, youtube videos, or just doodling."))
-        .kid(P.text("The point anyway is to have something to look back at in the future, and to not take learning Blender too seriously."))
+        .kid(P.text(
+            "I might log work from following paid tutorials, youtube videos, or just doodling.",
+        ))
+        .kid(P.text(
+            "The point anyway is to have something to look back at in the future, and to not take \
+             learning Blender too seriously.",
+        ))
         .kid(Div.class("breather-y").kid(tut1));
 
     // for fake_tutorial in 0..10 {

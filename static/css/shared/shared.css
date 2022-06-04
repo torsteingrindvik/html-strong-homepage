@@ -37,19 +37,16 @@ footer {
 
 .base-body {
 	width    : 100%;
-	max-width: 60%;
+	max-width: 50%;
 
 	/* These two center content! */
 	margin-left : auto;
 	margin-right: auto;
 
-	padding-top   : 1rem;
-	padding-bottom: 1rem;
-
 	grid-row: 2;
 }
 
-@media (max-width: 1200px) {
+@media (max-width: 1000px) {
 	.base-body {
 		max-width: 90%;
 	}
@@ -116,6 +113,10 @@ footer {
 .breather-y {
 	margin-top   : 2rem;
 	margin-bottom: 2rem;
+}
+
+.padding {
+	padding: 1rem;
 }
 
 .grid-4 {
