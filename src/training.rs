@@ -177,8 +177,10 @@ fn huberman_podcast_with_andy_galpin() -> impl NodeExt {
         .header("Breathing Tools for Resistance Training & Post-Training")
         .p("If can brace when breathing, don't care.")
         .p("Try doing double exhale time to inhale for calming down between stuff. Productive!")
-        .p("Really do this even while showering. Take a few mins to \
-            do this breathing to tell the body it's safe.")
+        .p(
+            "Really do this even while showering. Take a few mins to do this breathing to tell \
+             the body it's safe.",
+        )
         .header("Endurance Training & Combining with Strength")
         .p("Now it's more about endurance, so let's not write more notes.")
 }
@@ -202,25 +204,47 @@ fn new_science_of_muscle_hypertrophy_1() -> impl NodeExt {
         .header("Show you ACTUAL elite athlete muscle fibers (15:00)")
         .p("Cool, actual fibers like small threads out of a red chunk of muscle/myo fiber/cell")
         .p("So fibers are made of myofibril, which again contains actin, myosin")
-        .p("Sarcomeres run along the length of a fiber. Can make more of these in series or more in parallel to get more muscle volume")
+        .p(
+            "Sarcomeres run along the length of a fiber. Can make more of these in series or more \
+             in parallel to get more muscle volume",
+        )
         .header("Myofiber lengthening")
         .p("Pennation angle (angle of muscle fibers) can change due to hypertrophy (7-14%)")
         .p("Fascicle length too. But insertion point of muscle is not changed")
         .header("Myofiber splitting & hyperplasia")
         .p("Diameter of fibers increase with hypertrophy")
-        .p("This means to increase number of muscle fibers. Hard to know, increases in cats though..")
-        .p("Maybe more realistic that we split fibers and they grow independent. Likely possible but very uncommon (unless steroids)")
+        .p(
+            "This means to increase number of muscle fibers. Hard to know, increases in cats \
+             though..",
+        )
+        .p(
+            "Maybe more realistic that we split fibers and they grow independent. Likely possible \
+             but very uncommon (unless steroids)",
+        )
         .header("Myofiber growth (47:30)")
-        .p("Resistance exercise is very well documented to increase muscle cell cross sectional area")
+        .p(
+            "Resistance exercise is very well documented to increase muscle cell cross sectional \
+             area",
+        )
         .header("Bodybuilder vs. powerlifter muscle growth (sarcoplasmic hypertrophy)")
-        .p("Powerlifter more functional hypertrophy, more contractile stuff == myofibrils. Bodybuilders more non-functional growth. Non-contractile sarcoplasmic proteins. Disproportionately more fluids!")
+        .p(
+            "Powerlifter more functional hypertrophy, more contractile stuff == myofibrils. \
+             Bodybuilders more non-functional growth. Non-contractile sarcoplasmic proteins. \
+             Disproportionately more fluids!",
+        )
 }
 
 fn new_science_of_muscle_hypertrophy_2() -> impl NodeExt {
     Article::new()
         .header("5 Steps To Activating Muscle Growth")
-        .p("1: Stimulus. Of the muscle cell membrane. Mechanical tension, by lifting 'heavy' (30-60%+ of 1RM")
-        .p("Amount of soreness is not really a good indicator. Muscle damage not a goal in itself (DOMS).")
+        .p(
+            "1: Stimulus. Of the muscle cell membrane. Mechanical tension, by lifting 'heavy' \
+             (30-60%+ of 1RM",
+        )
+        .p(
+            "Amount of soreness is not really a good indicator. Muscle damage not a goal in \
+             itself (DOMS).",
+        )
         .p("The 'pump' can be an indicator (of metabolic stress, good)")
         .p("2: Signaling")
         .p("3: Gene expression")
@@ -228,23 +252,40 @@ fn new_science_of_muscle_hypertrophy_2() -> impl NodeExt {
         .header("TESTOSTERONE?")
         .p("Natural testosterone levels do not matter much.")
         .header("Signaling (Cytoplasm)")
-        .p("So the cell wall (sarcoma)? has protein receptors.\
-        If we can create some stimulus, this creates an anabolic signal inside the cell, for signaling proteins.\
-        Called an anabolic cascade.")
+        .p(
+            "So the cell wall (sarcoma)? has protein receptors.If we can create some stimulus, \
+             this creates an anabolic signal inside the cell, for signaling proteins.Called an \
+             anabolic cascade.",
+        )
         .header("Cell Signaling")
-        .p("Anabolic is growing. Catabolic is breaking down. Inhibitors (e.g. myostatin) stop the anabolic process (else cancer).")
+        .p(
+            "Anabolic is growing. Catabolic is breaking down. Inhibitors (e.g. myostatin) stop \
+             the anabolic process (else cancer).",
+        )
         .header("Protein Synthesis (Ribosomes)")
-        .p("We can have lots of protein synthesis, but we have protein breakdown too. We need a positive balance.")
+        .p(
+            "We can have lots of protein synthesis, but we have protein breakdown too. We need a \
+             positive balance.",
+        )
         .header("Overall Protein Balance")
-        .p("Sitting still has you in a negative balance. Resistance exercise will move you towards hypertrophy, but\
-        can't get you positive by itself. A high protein meal moves you up into hypertrophy.\
-        Both resistance exercise and a high protein meal takes you far up. Carbs too are necessary.")
+        .p(
+            "Sitting still has you in a negative balance. Resistance exercise will move you \
+             towards hypertrophy, butcan't get you positive by itself. A high protein meal moves \
+             you up into hypertrophy.Both resistance exercise and a high protein meal takes you \
+             far up. Carbs too are necessary.",
+        )
         .p("The above holds given essential amino acids. Needs the leucine threshold.")
         .header("If You Want To Add Muscle, You Have To..")
         .p("* Train. Stress, tension, damage. Need to signal the cells.")
-        .p("* Eat. Fuel the training (carbs) and build back up (proteins). Protein synthesis is faster with carbs (woah keto spooky).")
+        .p(
+            "* Eat. Fuel the training (carbs) and build back up (proteins). Protein synthesis is \
+             faster with carbs (woah keto spooky).",
+        )
         .header("Short summary")
-        .p("Hit tension/stress/damage 1-3x per week per muscle group, eat >=10% Kcal surplus and at at least 1g/kg protein.")
+        .p(
+            "Hit tension/stress/damage 1-3x per week per muscle group, eat >=10% Kcal surplus and \
+             at at least 1g/kg protein.",
+        )
 }
 
 fn new_science_of_muscle_hypertrophy_3() -> impl NodeExt {
@@ -259,13 +300,21 @@ fn new_science_of_muscle_hypertrophy_3() -> impl NodeExt {
         .header("Anabolic Window")
         .p("I.e. when to eat. It does exist. Look at separate video (TODO).")
         .header("Volume")
-        .p("Volume is king! Accumulate work. 10 sets per week up to 20 sets per week per muscle.\
-        After some years, maybe even 20 to even 30 sets per week.")
+        .p(
+            "Volume is king! Accumulate work. 10 sets per week up to 20 sets per week per \
+             muscle.After some years, maybe even 20 to even 30 sets per week.",
+        )
         .p("5 sets a week enough for maintenance.")
         .p("Have to balance volume against fatigue.")
         .header("Intensity (31:30)")
-        .p("~30-85% 1RM. Kinda idiot proof as long as you get the volume. Just gotta hit tension/stress/damage.")
-        .p("Do some stuff all around the spectrum! But note that higher strength is best gained at higher %s")
+        .p(
+            "~30-85% 1RM. Kinda idiot proof as long as you get the volume. Just gotta hit \
+             tension/stress/damage.",
+        )
+        .p(
+            "Do some stuff all around the spectrum! But note that higher strength is best gained \
+             at higher %s",
+        )
         .p("Implicit: Gotta do to failure or close (especially at lower %s)")
         .header("Training to failure (35:30)")
         .p("Stopping 1-3 reps short of failure seems to be OK, when volume is equated.")
@@ -274,20 +323,33 @@ fn new_science_of_muscle_hypertrophy_3() -> impl NodeExt {
         .p("Science varies. Switch it up.")
         .header("Frequency (times per week per muscle group)")
         .p("When volume is equated, does not matter too much!")
-        .p("Say we do squats, leg press, leg extensions, each 3 sets. That's 9 sets for legs. If we want to get 15-25 sets per week\
-        that's a lot for 1 day. So makes more sense to spread it out.")
+        .p(
+            "Say we do squats, leg press, leg extensions, each 3 sets. That's 9 sets for legs. If \
+             we want to get 15-25 sets per weekthat's a lot for 1 day. So makes more sense to \
+             spread it out.",
+        )
         .p("Seems 3x a week is a nice sweet spot.")
         .header("Which exercises work best")
         .p("Application of exercises is what matters, and volume. Not the exercise itself.")
-        .p("Exercise considerations: Movement plane, muscles/joints, contraction type, technical proficiency")
-        .p("For hypertrophy you can choose by movement (vertical press, horizontal row, etc.) or by muscle.\
-        We just gotta find the thing that hits the muscle")
-        .p("Order vs chaos: Order is doing the same exercise the same way every time. But then we might not\
-        get well rounded. But if we do chaos (variations in movement, incline, bars etc.) we might not hit the same spot enough\
-        for growth. Gotta balance!")
+        .p(
+            "Exercise considerations: Movement plane, muscles/joints, contraction type, technical \
+             proficiency",
+        )
+        .p(
+            "For hypertrophy you can choose by movement (vertical press, horizontal row, etc.) or \
+             by muscle.We just gotta find the thing that hits the muscle",
+        )
+        .p(
+            "Order vs chaos: Order is doing the same exercise the same way every time. But then \
+             we might notget well rounded. But if we do chaos (variations in movement, incline, \
+             bars etc.) we might not hit the same spot enoughfor growth. Gotta balance!",
+        )
         .header("Renaissance Periodization")
-        .p("Simple system, 0-2 points for little-much for each of these: Pump, next day soreness, feel in muscle during exercise.\
-        As a rule we want to get 4-5 points. 5-6 over time can be fatiguing, 0-3 can be suboptimal.")
+        .p(
+            "Simple system, 0-2 points for little-much for each of these: Pump, next day \
+             soreness, feel in muscle during exercise.As a rule we want to get 4-5 points. 5-6 \
+             over time can be fatiguing, 0-3 can be suboptimal.",
+        )
         .header("Partial vs. Full range of motion")
         .p("Default: Try getting joints through all ranges of motion (in good form).")
         .p("Full ROM most of the time. Do some partials once in a while.")
@@ -299,8 +361,11 @@ fn new_science_of_muscle_hypertrophy_3() -> impl NodeExt {
         .p("Whatever. What fits your lifestyle.")
         .header("Potpourri")
         .p("For hypertrophy: It's all about the quality of the contractions and the volume!")
-        .p("Can't finish the reps/sets? What do? Keep weight do less reps, or less weight more reps?\
-        Does not matter too much. But volume is important, so cut some weight and get the volume in.")
+        .p(
+            "Can't finish the reps/sets? What do? Keep weight do less reps, or less weight more \
+             reps?Does not matter too much. But volume is important, so cut some weight and get \
+             the volume in.",
+        )
         .header("Summary")
         .p("Both complex and single join exercises (big/specific)")
         .p("15-25 sets pr week pr muscle group")
@@ -321,7 +386,8 @@ pub async fn training() -> Result<Html<String>, (StatusCode, String)> {
     let spacer = Hr.class("lil-room");
 
     contents.push_kid(Source::new(
-        "Dr. Andy Galpin: How to Build Strength, Muscle Size & Endurance | Huberman Lab Podcast #65",
+        "Dr. Andy Galpin: How to Build Strength, Muscle Size & Endurance | Huberman Lab Podcast \
+         #65",
         "https://www.youtube.com/watch?v=IAnhFUUCq6c",
         huberman_podcast_with_andy_galpin(),
     ));
