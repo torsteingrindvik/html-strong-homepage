@@ -385,6 +385,12 @@ pub async fn training() -> Result<Html<String>, (StatusCode, String)> {
 
     let spacer = Hr.class("lil-room");
 
+    contents.push_kid(Div.kid(Em.text(
+        "These are just my shorthand-ish notes from some exercise related videos, if you aren't \
+         me this is probably of little use as it won't make a lot of sense. The linked videos are \
+         great though!",
+    )));
+
     contents.push_kid(Source::new(
         "Dr. Andy Galpin: How to Build Strength, Muscle Size & Endurance | Huberman Lab Podcast \
          #65",
