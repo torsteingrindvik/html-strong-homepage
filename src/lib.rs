@@ -2,18 +2,7 @@ use std::fmt::Display;
 
 pub mod base;
 pub mod common;
-
-// pub mod base_urls {
-//     pub const HOME: &str = "/";
-//     pub const BLENDER: &str = "/blender";
-
-//     // Append one of the base urls to one of these
-//     // to get the path to more specific content.
-//     // pub mod statics {
-//     //     pub const CSS: &str = "/static/css";
-//     //     pub const IMG: &str = "/static/img";
-//     // }
-// }
+pub mod components;
 
 #[derive(Debug)]
 pub enum Base {
