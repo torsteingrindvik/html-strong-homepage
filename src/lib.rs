@@ -79,7 +79,14 @@ impl ContentUrl {
     }
 
     /// Get the url to this content, appending an extra url fragment at the end.
+    /// Removes a leading slash if it contains it.
     pub fn suburl(&self, url: &str) -> String {
+        let url = if url.starts_with('/') {
+            &url[1..]
+        } else {
+            &url[..]
+        };
+
         format!("{}/{url}", self.url())
     }
 

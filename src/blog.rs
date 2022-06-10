@@ -87,7 +87,8 @@ impl NodeExt for BlogEntry {
 }
 
 async fn blog_page(node: Node) -> Result<Html<String>, (StatusCode, String)> {
-    let html = html_doc::<String>(None, None, None, node);
+    let content = ContentUrl::new(Base::Blog);
+    let html = html_doc::<String>(Some(vec![content.css("blog.css")]), None, None, node);
 
     render(html).await
 }

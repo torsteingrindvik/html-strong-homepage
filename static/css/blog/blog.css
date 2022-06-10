@@ -1,0 +1,9 @@
+.blog-shell {
+  background: rgb(231, 236, 226);
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+}
+
+.blog-section p {
+  margin-bottom: 2rem;
+}

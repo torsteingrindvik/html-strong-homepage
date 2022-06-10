@@ -15,6 +15,7 @@ tokio = { version = "1", features = ["full"] }
 tower = { version = "0.4", features = ["full"] }
 tower-http = { version = "0.2", features = ["fs", "trace", "compression-full"] }
 reqwest = { version = "0.11", features = ["json"] }
+html-escape = "0.2.11"
 
 # serde = { version = "1.0.136", features = ["derive"] }
 # futures = "0.3"
