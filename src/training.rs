@@ -1,102 +1,10 @@
-use axum::response::Html;
-use html_strong::document_tree::Node;
-use html_strong::{science_lab::NodeExt, tags::*};
-use reqwest::StatusCode;
+use crate::components::Article;
 
-use crate::base::html_doc;
-use crate::common::render;
-
-#[derive(Debug)]
-struct Section {
-    title: String,
-    paragraphs: Vec<String>,
-}
-
-impl Section {
-    fn new(title: &'static str) -> Self {
-        Self {
-            title: title.into(),
-            paragraphs: vec![],
-        }
-    }
-
-    fn push(&mut self, paragraph: &'static str) {
-        self.paragraphs.push(paragraph.into());
-    }
-}
-
-#[derive(Debug)]
-struct Article {
-    sections: Vec<Section>,
-}
-
-impl Article {
-    fn new() -> Self {
-        Self { sections: vec![] }
-    }
-
-    fn p(mut self, text: &'static str) -> Self {
-        let mut section = self.sections.pop().unwrap();
-        section.push(text.into());
-        self.sections.push(section);
-        self
-    }
-
-    fn header(mut self, text: &'static str) -> Self {
-        self.sections.push(Section::new(text));
-        self
-    }
-}
-
-impl NodeExt for Article {
-    fn into_node(self) -> Node {
-        let mut output = Div.id("training");
-
-        for h in self.sections {
-            let classes = "training-section breather-y";
-            let mut section = Div.class(classes).kid(H2.text(h.title));
-
-            for p in h.paragraphs {
-                section.push_kid(P.text(p).class("lil-room"))
-            }
-
-            output.push_kid(section);
-        }
-        output
-    }
-}
-
-#[derive(Debug, Clone)]
-struct Source {
-    title: String,
-    url: String,
-    contents: Node,
-}
-
-impl Source {
-    fn new(title: &str, url: &str, contents: impl NodeExt) -> Self {
-        Self {
-            title: title.to_string(),
-            url: url.to_string(),
-            contents: contents.into_node(),
-        }
-    }
-}
-
-impl NodeExt for Source {
-    fn into_node(self) -> Node {
-        Div.kid(H1.text(self.title))
-            .kid(
-                P.text("Information found ")
-                    .kid(A::href(&self.url).text("here"))
-                    .text("."),
-            )
-            .kid(self.contents)
-    }
-}
-
-fn huberman_podcast_with_andy_galpin() -> impl NodeExt {
+pub fn huberman_podcast_with_andy_galpin() -> Article {
     Article::new()
+        .header("Video")
+        .p("")
+        .youtube("https://www.youtube.com/embed/IAnhFUUCq6c")
         .header("Adaptations of Exercise, Progressive Overload")
         .p("Needs progressive overload, stress. More weight, more reps, more often etc.")
         .header("Modifiable Variables, One-Rep Max, Muscle Soreness")
@@ -185,8 +93,11 @@ fn huberman_podcast_with_andy_galpin() -> impl NodeExt {
         .p("Now it's more about endurance, so let's not write more notes.")
 }
 
-fn eating_for_hypertrophy() -> impl NodeExt {
+pub fn eating_for_hypertrophy() -> Article {
     Article::new()
+        .header("Video")
+        .p("")
+        .youtube("https://www.youtube.com/embed/0fCtyTChU_U")
         .header("Hypertrophy eating")
         .p("Need caloric surplus. 10-15% caloric surplus is the research.")
         .p("2-4g/kg proteins. 2g considered low end for hypertrophy.")
@@ -195,8 +106,11 @@ fn eating_for_hypertrophy() -> impl NodeExt {
         .p("Probably doesn't matter that meals are _directly_ after a workout")
 }
 
-fn new_science_of_muscle_hypertrophy_1() -> impl NodeExt {
+pub fn new_science_of_muscle_hypertrophy_1() -> Article {
     Article::new()
+        .header("Video")
+        .p("")
+        .youtube("https://www.youtube.com/embed/MyKrc-fheBw")
         .header("How much muscle grows (9:05)")
         .p("5-20% muscle volume mass in first 8-16 weeks")
         .header("Is the growth uniform across the muscle? (9:50)")
@@ -234,8 +148,11 @@ fn new_science_of_muscle_hypertrophy_1() -> impl NodeExt {
         )
 }
 
-fn new_science_of_muscle_hypertrophy_2() -> impl NodeExt {
+pub fn new_science_of_muscle_hypertrophy_2() -> Article {
     Article::new()
+        .header("Video")
+        .p("")
+        .youtube("https://www.youtube.com/embed/-FR5CQhsDg4")
         .header("5 Steps To Activating Muscle Growth")
         .p(
             "1: Stimulus. Of the muscle cell membrane. Mechanical tension, by lifting 'heavy' \
@@ -288,8 +205,11 @@ fn new_science_of_muscle_hypertrophy_2() -> impl NodeExt {
         )
 }
 
-fn new_science_of_muscle_hypertrophy_3() -> impl NodeExt {
+pub fn new_science_of_muscle_hypertrophy_3() -> Article {
     Article::new()
+        .header("Video")
+        .p("")
+        .youtube("https://www.youtube.com/embed/cw6XPWaEK20")
         .header("How many calories for muscle growth")
         .p("10-15% surplus at least")
         .p("Carbohydrates: 4-7g/kg")
@@ -378,55 +298,4 @@ fn new_science_of_muscle_hypertrophy_3() -> impl NodeExt {
         .p("Slow progressive overload")
         .p("Be consistent, build habits")
         .p("Over long time, multi-join controlled speed full ROM stuff is nice")
-}
-
-pub async fn training() -> Result<Html<String>, (StatusCode, String)> {
-    let mut contents = Div.kid(Style.text(".lil-room { margin-bottom: 1.0rem }"));
-
-    let spacer = Hr.class("lil-room");
-
-    contents.push_kid(Div.kid(Em.text(
-        "These are just my shorthand-ish notes from some exercise related videos, if you aren't \
-         me this is probably of little use as it won't make a lot of sense. The linked videos are \
-         great though!",
-    )));
-
-    contents.push_kid(Source::new(
-        "Dr. Andy Galpin: How to Build Strength, Muscle Size & Endurance | Huberman Lab Podcast \
-         #65",
-        "https://www.youtube.com/watch?v=IAnhFUUCq6c",
-        huberman_podcast_with_andy_galpin(),
-    ));
-    contents.push_kid(spacer.clone());
-
-    contents.push_kid(Source::new(
-        "Eating for Hypertrophy : 5 Min Phys",
-        "https://www.youtube.com/watch?v=0fCtyTChU_U",
-        eating_for_hypertrophy(),
-    ));
-    contents.push_kid(spacer.clone());
-
-    contents.push_kid(Source::new(
-        "New Science of Muscle Hypertrophy - Part 1, Physiology",
-        "https://www.youtube.com/watch?v=MyKrc-fheBw",
-        new_science_of_muscle_hypertrophy_1(),
-    ));
-    contents.push_kid(spacer.clone());
-
-    contents.push_kid(Source::new(
-        "New Science of Muscle Hypertrophy - Part 2, Stimuli",
-        "https://www.youtube.com/watch?v=-FR5CQhsDg4",
-        new_science_of_muscle_hypertrophy_2(),
-    ));
-    contents.push_kid(spacer.clone());
-
-    contents.push_kid(Source::new(
-        "New Science of Muscle Hypertrophy - Part 3, Eating & Training",
-        "https://www.youtube.com/watch?v=cw6XPWaEK20",
-        new_science_of_muscle_hypertrophy_3(),
-    ));
-
-    let html = html_doc::<String>(None, None, None, contents);
-
-    render(html).await
 }

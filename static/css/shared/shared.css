@@ -133,7 +133,6 @@ footer {
 	display      : grid;
 	gap          : 1rem;
 	align-items  : center;
-	justify-items: center;
 
 	grid-template-rows   : 1fr;
 	grid-template-columns: repeat(4, 1fr);
@@ -150,7 +149,6 @@ footer {
 	display      : grid;
 	gap          : 1rem;
 	align-items  : center;
-	justify-items: center;
 
 	grid-template-rows   : 1fr;
 	grid-template-columns: repeat(3, 1fr);
@@ -163,6 +161,22 @@ footer {
 	}
 }
 
+.grid-2 {
+	display      : grid;
+	gap          : 1rem;
+	align-items  : center;
+
+	grid-template-rows   : 1fr;
+	grid-template-columns: repeat(2, 1fr);
+}
+
+@media (max-width: 1000px) {
+	.grid-2 {
+		grid-template-rows   : 0.5fr 0.5fr;
+		grid-template-columns: 1fr;
+	}
+}
+
 .component-shell {
   background: rgb(231, 236, 226);
   padding-left: 0.5rem;
@@ -171,4 +185,18 @@ footer {
 
 .blog-section p {
   margin-bottom: 2rem;
+}
+
+pre {
+	width: 100%;
+	font-size: smaller;
+}
+
+code * {
+	font-family: 'Comic Mono', monospace;
+	font-weight: bold;
+}
+
+.language-rust {
+	line-height: 100%;
 }

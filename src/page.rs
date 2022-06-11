@@ -1,0 +1,303 @@
+use axum::{extract::Path, response::Html, routing::get, Extension, Router};
+use html_strong::{document_tree::Node, science_lab::NodeExt, tags::*};
+use reqwest::StatusCode;
+use std::sync::Arc;
+
+use crate::{
+    base::html_doc,
+    common::{no_such_page, render},
+    components::Article,
+};
+
+#[derive(Debug, Clone)]
+pub enum Rhs {
+    OneImage { path: String },
+    TwoImages { path1: String, path2: String },
+    Code(String),
+    Nothing,
+}
+
+impl Rhs {
+    pub fn code(code: &str) -> Self {
+        Self::Code(code.to_string())
+    }
+
+    pub fn one_image(path: &str) -> Self {
+        Self::OneImage {
+            path: path.to_string(),
+        }
+    }
+
+    pub fn two_images(path1: &str, path2: &str) -> Self {
+        Self::TwoImages {
+            path1: path1.to_string(),
+            path2: path2.to_string(),
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+struct Card {
+    /// Card title.
+    title: String,
+
+    /// Card description.
+    description: String,
+
+    /// Url to go to when card is clicked.
+    url: String,
+
+    /// What do display on the right hand side of the card.
+    rhs: Rhs,
+}
+
+impl Card {
+    pub fn new(title: &str, description: &str, url: &str, rhs: Rhs) -> Self {
+        Self {
+            title: title.to_string(),
+            description: description.to_string(),
+            url: url.to_string(),
+            rhs,
+        }
+    }
+}
+
+impl NodeExt for Card {
+    fn into_node(self) -> Node {
+        // Wrap the whole thing in a clickable link
+        let card = A::href(&self.url);
+
+        // The card will always have a title and a description
+        let card_contents = Div.kid(H2.text(self.title)).kid(P.text(self.description));
+
+        // The right hand side of the card might have various things,
+        // which also determines the grid class.
+        let card_contents = match self.rhs {
+            Rhs::OneImage { path } => card_contents.class("grid-3").kid(Div.text(path)),
+            Rhs::TwoImages { path1, path2 } => card_contents
+                .class("grid-4")
+                .kid(Div.text(&format!("{path1}, {path2}"))),
+            Rhs::Code(code) => card_contents
+                .class("grid-3")
+                .kid(Pre.kid(Code.class("rounded language-rust").text(code))),
+            Rhs::Nothing => card_contents.class("grid-2"),
+        };
+
+        Div.class("card-bg padding rounded ease link-reset")
+            .kid(card.kid(card_contents))
+    }
+}
+
+#[derive(Debug, Clone)]
+struct Post {
+    card: Card,
+    contents: Article,
+}
+
+impl Post {
+    pub fn new(card: Card, contents: Article) -> Self {
+        Self { card, contents }
+    }
+}
+
+#[derive(Debug, Clone)]
+struct Series {
+    pub card: Card,
+    pub posts: Vec<Post>,
+}
+
+impl Series {
+    pub fn new(card: Card, posts: Vec<Post>) -> Self {
+        Self { card, posts }
+    }
+
+    pub fn posts(&self) -> &[Post] {
+        &self.posts
+    }
+}
+
+#[derive(Debug, Clone)]
+struct Context {
+    /// Page title.
+    title: String,
+
+    /// Page description.
+    description: String,
+
+    /// The series on this page.
+    series: Arc<Vec<Series>>,
+
+    /// Url to this page.
+    pub url: &'static str,
+}
+
+async fn render_page(node: Node) -> Result<Html<String>, (StatusCode, String)> {
+    let html = html_doc(
+        Some(vec![
+            "https://cdn.jsdelivr.net/npm/comic-mono@0.0.1/index.css",
+            "//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.1/styles/monokai.min.css",
+        ]),
+        Some(vec![
+            "//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.1/highlight.min.js",
+        ]),
+        Some(vec!["hljs.highlightAll();"]),
+        node,
+    );
+
+    render(html).await
+}
+
+async fn page(Extension(state): Extension<Page>) -> Result<Html<String>, (StatusCode, String)> {
+    let &Context {
+        title, description, ..
+    } = &state.context.as_ref();
+
+    let mut content = Div
+        .class("page")
+        .kid(H1.text(title))
+        .kid(P.text(description))
+        .kid(Br);
+
+    for series in state.series() {
+        content.push_kid(series.card.clone().class("breather-y"));
+    }
+
+    render_page(content.into_node()).await
+}
+
+async fn series(
+    Path(series_path): Path<String>,
+    Extension(state): Extension<Page>,
+) -> Result<Html<String>, (StatusCode, String)> {
+    let mut content = Div.class("series");
+
+    if let Some(series) = state.serie(&series_path) {
+        for post in &*series.posts() {
+            content.push_kid(post.card.clone().class("breather-y"));
+        }
+        render_page(content.into_node()).await
+    } else {
+        Err(no_such_page(series_path).await)
+    }
+}
+
+async fn post(
+    Path((series_path, post_path)): Path<(String, String)>,
+    Extension(state): Extension<Page>,
+) -> Result<Html<String>, (StatusCode, String)> {
+    if let Some(post) = state.post(&series_path, &post_path) {
+        render_page(Div.class("post").kid(post.contents.clone().into_node())).await
+    } else {
+        Err(no_such_page(format!("{series_path}/{post_path}")).await)
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct Page {
+    context: Arc<Context>,
+}
+
+#[derive(Debug, Clone)]
+pub struct PageBuilder {
+    url: &'static str,
+    title: String,
+    description: String,
+    series: Vec<Series>,
+}
+
+impl PageBuilder {
+    pub fn new(url: &'static str, title: &str, description: &str) -> Self {
+        Self {
+            url,
+            title: title.to_string(),
+            description: description.to_string(),
+            series: vec![],
+        }
+    }
+
+    pub fn series(mut self, url: &str, title: &str, description: &str, rhs: Rhs) -> Self {
+        let url = format!("{}/{url}", self.url);
+        self.series.push(Series::new(
+            Card::new(title, description, &url, rhs),
+            vec![],
+        ));
+        self
+    }
+
+    pub fn post(
+        mut self,
+        url: &str,
+        title: &str,
+        description: &str,
+        rhs: Rhs,
+        mut contents: Article,
+    ) -> Self {
+        let current_series = self
+            .series
+            .last_mut()
+            .expect("should start a series before posts are added");
+
+        let url = format!("{}/{url}", current_series.card.url);
+
+        // Note: The url already has a leading slash.
+        contents.url_prefix = Some(format!("/static{url}"));
+
+        current_series.posts.push(Post::new(
+            Card::new(title, description, &url, rhs),
+            contents,
+        ));
+        self
+    }
+
+    pub fn build(self) -> Page {
+        Page::new(self.url, &self.title, &self.description, self.series)
+    }
+}
+
+impl Page {
+    fn new(url: &'static str, title: &str, description: &str, series: Vec<Series>) -> Self {
+        let context = Context {
+            title: title.to_string(),
+            description: description.to_string(),
+            series: Arc::new(series),
+            url,
+        };
+
+        Self {
+            context: Arc::new(context),
+        }
+    }
+
+    pub fn router(&self) -> Router {
+        let state: Page = self.clone();
+
+        Router::new()
+            .route("/", get(page))
+            .route("/:series", get(series))
+            .route("/:series/:post", get(post))
+            .layer(Extension(state))
+    }
+
+    pub fn url(&self) -> &'static str {
+        self.context.url
+    }
+
+    fn series(&self) -> &[Series] {
+        self.context.as_ref().series.as_ref()
+    }
+
+    fn serie(&self, serie_url: &str) -> Option<&Series> {
+        self.series()
+            .iter()
+            .find(|serie| serie.card.url == format!("{}/{serie_url}", self.url()))
+    }
+
+    fn post(&self, serie_url: &str, post_url: &str) -> Option<&Post> {
+        self.serie(serie_url).and_then(|serie| {
+            serie
+                .posts()
+                .iter()
+                .find(|post| post.card.url == format!("{}/{serie_url}/{post_url}", self.url()))
+        })
+    }
+}

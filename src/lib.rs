@@ -1,8 +1,10 @@
 use std::fmt::Display;
 
+
 pub mod base;
 pub mod common;
 pub mod components;
+pub mod page;
 
 #[derive(Debug)]
 pub enum Base {

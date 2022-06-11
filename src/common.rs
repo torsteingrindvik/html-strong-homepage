@@ -9,6 +9,13 @@ pub async fn internal_server_error(error: std::io::Error) -> (StatusCode, String
     )
 }
 
+pub async fn no_such_page(path: String) -> (StatusCode, String) {
+    (
+        StatusCode::NOT_FOUND,
+        format!("Page not found: {path}"),
+    )
+}
+
 pub async fn render(contents: Node) -> Result<Html<String>, (StatusCode, String)> {
     let response = contents.render_string().map_err(|e| {
         (

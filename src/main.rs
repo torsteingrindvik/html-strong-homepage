@@ -11,7 +11,11 @@ use tower_http::{
 };
 
 use html_strong_homepage::{
-    blender, blog, common::internal_server_error, home, training, Base, ContentUrl,
+    blog,
+    common::internal_server_error,
+    home,
+    page::{self, Rhs},
+    training, Base, ContentUrl,
 };
 
 #[tokio::main]
@@ -19,15 +23,76 @@ pub async fn main() {
     tracing_subscriber::fmt::init();
 
     let content_home = ContentUrl::new(Base::Home);
-    let content_blog = ContentUrl::new(Base::Blog);
-    let content_blender = ContentUrl::new(Base::Blender);
-    let content_training = ContentUrl::new(Base::Training);
+
+    let blog = page::PageBuilder::new(
+        "/blog",
+        "Blog series",
+        "Here you'll find links to blog series. These will likely be explorations of various \
+             Rust related things. 🦀",
+    )
+    .series(
+        "tracing",
+        "Tracing",
+        "Understanding tokio's tracing library.",
+        Rhs::code("tracing_subscriber::fmt::init();"),
+    )
+    .post(
+        "overview",
+        "2022-xx-yy",
+        "Hello world/tracing! Let's get an overview of what tracing is and why we'd want \
+                 to use it.",
+        Rhs::Nothing,
+        blog::tracing::intro(),
+    )
+    .build();
+
+    let blender = page::PageBuilder::new(
+        "/blender",
+        "Blender Work Logs",
+        "Here follows my work logs (e.g. in-progress images and such).
+        
+        I might log work from following paid tutorials, youtube videos, or just doodling.
+        
+        The point anyway is to have something to look back at in the future, and to not take \
+             learning Blender too seriously.",
+    )
+    .series(
+        "low-poly-landscapes",
+        "Low Poly Landscapes",
+        "A stylized tutorial by Grant Abbitt on creating low polygon count landscapes.",
+        Rhs::two_images("after-the-mirror-modifier.webp", "goal.webp"),
+    )
+    .series(
+        "low-poly-characters",
+        "Low Poly Characters",
+        "A stylized tutorial by Grant Abbitt on creating low polygon count characters.",
+        Rhs::two_images("cube.webp", "goal.webp"),
+    )
+    .build();
+
+    let training = page::PageBuilder::new(
+        "/training",
+        "Training notes",
+        "Notes from videos about working out. Written in shorthand, so likely only understood by me!",
+    )
+    .series(
+        "hypertrophy",
+        "Hypertrophy",
+        "Notes from videos specifically about hypertrophy",
+        Rhs::Nothing,
+    )
+    .post("galpin-huberman-podcast", "Strength, Muscle Size & Endurance", "Dr. Andy Galpin: How to Build Strength, Muscle Size & Endurance | Huberman Lab Podcast #65", Rhs::Nothing, training::huberman_podcast_with_andy_galpin())
+    .post("eating-for-hypertrophy", "Eating for Hypertrophy", "A 5 minute video by Andy Galpin", Rhs::Nothing, training::eating_for_hypertrophy())
+    .post("new-science-of-muscle-hypertrophy-1", "New Science of Muscle Hypertrophy 1", "A long series by Dr. Andy Galpin. Episode theme: Physiology", Rhs::Nothing, training::new_science_of_muscle_hypertrophy_1())
+    .post("new-science-of-muscle-hypertrophy-2", "New Science of Muscle Hypertrophy 2", "A long series by Dr. Andy Galpin. Episode theme: Stimuli", Rhs::Nothing, training::new_science_of_muscle_hypertrophy_2())
+    .post("new-science-of-muscle-hypertrophy-3", "New Science of Muscle Hypertrophy 3", "A long series by Dr. Andy Galpin. Episode theme: Eating and training", Rhs::Nothing, training::new_science_of_muscle_hypertrophy_3())
+    .build();
 
     let app = Router::new()
         .route(&content_home.url(), get(home::home))
-        .nest(&content_blender.url(), blender::blender())
-        .nest(&content_blog.url(), blog::blog())
-        .route(&content_training.url(), get(training::training))
+        .nest(blog.url(), blog.router())
+        .nest(blender.url(), blender.router())
+        .nest(training.url(), training.router())
         .route(
             "/favicon.ico",
             get_service(ServeFile::new("static/favicon.ico")).handle_error(internal_server_error),

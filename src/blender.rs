@@ -13,6 +13,9 @@ use crate::base::html_doc;
 use crate::common::render;
 use crate::{Base, ContentUrl};
 
+mod low_poly_landscapes;
+mod low_poly_characters;
+
 #[derive(Debug, Clone)]
 struct BeforeAfterImages {
     before: String,
@@ -22,6 +25,7 @@ struct BeforeAfterImages {
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum Series {
     LowPolyLandscapes,
+    LowPolyCharacters,
 }
 
 #[derive(Debug, Clone)]
@@ -51,7 +55,7 @@ impl NodeExt for BlenderSeries {
         let content = ContentUrl::new(Base::Blender);
         let thumbnail_classes = "blender-series-thumbnail rounded";
 
-        Div.class("card-bg padding rounded ease link-reset").kid(
+        Div.class("card-bg padding rounded ease link-reset breather-y").kid(
             A::href(&self.path).kid(
                 Div.class("grid-4")
                     .kid(H2.text(self.series.name))
@@ -108,29 +112,44 @@ async fn blender_page(node: Node) -> Result<Html<String>, (StatusCode, String)> 
     render(html).await
 }
 
-mod low_poly_landscapes;
-
 pub type State = Arc<HashMap<Series, SeriesState>>;
 
 pub fn blender() -> Router {
-    let state: State = Arc::new(HashMap::from([(
-        Series::LowPolyLandscapes,
-        SeriesState {
-            before_after: BeforeAfterImages {
-                before: "after-the-mirror-modifier.webp".into(),
-                after: "goal.webp".into(),
-            },
-            name: "Low Poly Landscapes".into(),
-            description: "A tutorial on creating low polygon count landscapes.
+    let state: State = Arc::new(HashMap::from([
+        (
+            Series::LowPolyLandscapes,
+            SeriesState {
+                before_after: BeforeAfterImages {
+                    before: "after-the-mirror-modifier.webp".into(),
+                    after: "goal.webp".into(),
+                },
+                name: "Low Poly Landscapes".into(),
+                description: "A tutorial on creating low polygon count landscapes.
 		Very stylized.
-		Taught by the superb Grant Abbitt."
-                .into(),
-        },
-    )]));
+		Taught by Grant Abbitt."
+                    .into(),
+            },
+        ),
+        (
+            Series::LowPolyCharacters,
+            SeriesState {
+                before_after: BeforeAfterImages {
+                    before: "low-poly-characters/cube.webp".into(),
+                    after: "low-poly-characters/goal.webp".into(),
+                },
+                name: "Low Poly Characters".into(),
+                description: "A tutorial on creating low polygon count characters.
+		Very stylized.
+		Taught by Grant Abbitt."
+                    .into(),
+            },
+        ),
+    ]));
 
     Router::new()
         .route("/", get(landing))
         .nest("/low-poly-landscapes", low_poly_landscapes::router())
+        .nest("/low-poly-characters", low_poly_characters::router())
         .layer(Extension(state))
 }
 
@@ -146,9 +165,14 @@ pub async fn landing(
 ) -> Result<Html<String>, (StatusCode, String)> {
     let content = ContentUrl::new(Base::Blender);
 
-    let tut1 = BlenderSeries::new(
+    let low_poly_landscapes = BlenderSeries::new(
         &content.suburl("low-poly-landscapes"),
         state.get(&Series::LowPolyLandscapes).unwrap().clone(),
+    );
+
+    let low_poly_characters = BlenderSeries::new(
+        &content.suburl("low-poly-characters"),
+        state.get(&Series::LowPolyCharacters).unwrap().clone(),
     );
 
     let contents = Div
@@ -162,17 +186,11 @@ pub async fn landing(
             "The point anyway is to have something to look back at in the future, and to not take \
              learning Blender too seriously.",
         ))
-        .kid(Div.class("breather-y").kid(tut1));
-
-    // for fake_tutorial in 0..10 {
-    //     contents.push_kid(BlenderSeries::new(
-    //         &format!("Tutorial Ipsum {fake_tutorial}"),
-    //         "This describes the thing as well",
-    //         &content.suburl(&format!("fake-{fake_tutorial}")),
-    //         "after-the-mirror-modifier.webp",
-    //         "after-the-mirror-modifier.webp",
-    //     ));
-    // }
+        .kid(
+            Div.class("breather-y")
+                .kid(low_poly_landscapes)
+                .kid(low_poly_characters),
+        );
 
     blender_page(contents).await
 }
