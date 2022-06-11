@@ -11,9 +11,3 @@
 		grid: 0.5fr 0.5fr 1fr 1fr / 1fr;
 	}
 }
-
-.blender-series-thumbnail {
-	max-width: 320px;
-	width    : 100%;
-	height   : auto;
-}

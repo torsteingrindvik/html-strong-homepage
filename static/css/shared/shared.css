@@ -200,3 +200,9 @@ code * {
 .language-rust {
 	line-height: 100%;
 }
+
+.card-thumbnail {
+	max-width: 320px;
+	width    : 100%;
+	height   : auto;
+}

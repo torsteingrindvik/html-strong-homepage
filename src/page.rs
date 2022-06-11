@@ -34,6 +34,18 @@ impl Rhs {
             path2: path2.to_string(),
         }
     }
+
+    fn url_prefix(&mut self, prefix: &str) {
+        println!("Updating wiht {prefix}");
+        match self {
+            Rhs::OneImage { path } => *path = format!("{prefix}/{path}"),
+            Rhs::TwoImages { path1, path2 } => {
+                *path1 = format!("{prefix}/{path1}");
+                *path2 = format!("{prefix}/{path2}");
+            }
+            _ => {}
+        }
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -52,7 +64,7 @@ struct Card {
 }
 
 impl Card {
-    pub fn new(title: &str, description: &str, url: &str, rhs: Rhs) -> Self {
+    fn new(title: &str, description: &str, url: &str, rhs: Rhs) -> Self {
         Self {
             title: title.to_string(),
             description: description.to_string(),
@@ -70,13 +82,18 @@ impl NodeExt for Card {
         // The card will always have a title and a description
         let card_contents = Div.kid(H2.text(self.title)).kid(P.text(self.description));
 
+        let thumbnail_classes = "card-thumbnail rounded";
+
         // The right hand side of the card might have various things,
         // which also determines the grid class.
         let card_contents = match self.rhs {
-            Rhs::OneImage { path } => card_contents.class("grid-3").kid(Div.text(path)),
+            Rhs::OneImage { path } => card_contents
+                .class("grid-3")
+                .kid(Img::new(&path).class(thumbnail_classes)),
             Rhs::TwoImages { path1, path2 } => card_contents
                 .class("grid-4")
-                .kid(Div.text(&format!("{path1}, {path2}"))),
+                .kid(Img::new(&path1).class(thumbnail_classes))
+                .kid(Img::new(&path2).class(thumbnail_classes)),
             Rhs::Code(code) => card_contents
                 .class("grid-3")
                 .kid(Pre.kid(Code.class("rounded language-rust").text(code))),
@@ -215,8 +232,12 @@ impl PageBuilder {
         }
     }
 
-    pub fn series(mut self, url: &str, title: &str, description: &str, rhs: Rhs) -> Self {
+    pub fn series(mut self, url: &str, title: &str, description: &str, mut rhs: Rhs) -> Self {
         let url = format!("{}/{url}", self.url);
+
+        // url already has a leading slash.
+        rhs.url_prefix(&format!("/static{url}"));
+
         self.series.push(Series::new(
             Card::new(title, description, &url, rhs),
             vec![],
@@ -229,7 +250,7 @@ impl PageBuilder {
         url: &str,
         title: &str,
         description: &str,
-        rhs: Rhs,
+        mut rhs: Rhs,
         mut contents: Article,
     ) -> Self {
         let current_series = self
@@ -238,9 +259,14 @@ impl PageBuilder {
             .expect("should start a series before posts are added");
 
         let url = format!("{}/{url}", current_series.card.url);
+        let static_url = format!("/static{url}");
 
+        // Gotta update the card href with the url prefix.
+        rhs.url_prefix(&static_url);
+
+        // Gotta update the contents with the url prefix.
         // Note: The url already has a leading slash.
-        contents.url_prefix = Some(format!("/static{url}"));
+        contents.url_prefix = Some(static_url);
 
         current_series.posts.push(Post::new(
             Card::new(title, description, &url, rhs),
