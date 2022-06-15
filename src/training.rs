@@ -3,7 +3,6 @@ use crate::components::Article;
 pub fn huberman_podcast_with_andy_galpin() -> Article {
     Article::new()
         .header("Video")
-        .p("")
         .youtube("https://www.youtube.com/embed/IAnhFUUCq6c")
         .header("Adaptations of Exercise, Progressive Overload")
         .p("Needs progressive overload, stress. More weight, more reps, more often etc.")
@@ -96,7 +95,6 @@ pub fn huberman_podcast_with_andy_galpin() -> Article {
 pub fn eating_for_hypertrophy() -> Article {
     Article::new()
         .header("Video")
-        .p("")
         .youtube("https://www.youtube.com/embed/0fCtyTChU_U")
         .header("Hypertrophy eating")
         .p("Need caloric surplus. 10-15% caloric surplus is the research.")
@@ -109,7 +107,6 @@ pub fn eating_for_hypertrophy() -> Article {
 pub fn new_science_of_muscle_hypertrophy_1() -> Article {
     Article::new()
         .header("Video")
-        .p("")
         .youtube("https://www.youtube.com/embed/MyKrc-fheBw")
         .header("How much muscle grows (9:05)")
         .p("5-20% muscle volume mass in first 8-16 weeks")
@@ -151,7 +148,6 @@ pub fn new_science_of_muscle_hypertrophy_1() -> Article {
 pub fn new_science_of_muscle_hypertrophy_2() -> Article {
     Article::new()
         .header("Video")
-        .p("")
         .youtube("https://www.youtube.com/embed/-FR5CQhsDg4")
         .header("5 Steps To Activating Muscle Growth")
         .p(
@@ -208,7 +204,6 @@ pub fn new_science_of_muscle_hypertrophy_2() -> Article {
 pub fn new_science_of_muscle_hypertrophy_3() -> Article {
     Article::new()
         .header("Video")
-        .p("")
         .youtube("https://www.youtube.com/embed/cw6XPWaEK20")
         .header("How many calories for muscle growth")
         .p("10-15% surplus at least")
