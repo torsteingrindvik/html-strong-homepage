@@ -53,6 +53,9 @@ struct Card {
     /// Card title.
     title: String,
 
+    /// Displayed in a less prominent manner than the title.
+    subtitle: String,
+
     /// Card description.
     description: String,
 
@@ -64,9 +67,10 @@ struct Card {
 }
 
 impl Card {
-    fn new(title: &str, description: &str, url: &str, rhs: Rhs) -> Self {
+    fn new(title: &str, subtitle: &str, description: &str, url: &str, rhs: Rhs) -> Self {
         Self {
             title: title.to_string(),
+            subtitle: subtitle.to_string(),
             description: description.to_string(),
             url: url.to_string(),
             rhs,
@@ -79,10 +83,13 @@ impl NodeExt for Card {
         // Wrap the whole thing in a clickable link
         let card = A::href(&self.url);
 
-        // The card will always have a title and a description
-        let card_contents = Div.kid(H2.text(self.title)).kid(P.text(self.description));
+        // The card will always have a title, subltitle, and a description
+        let title_subtitle = Div.kid(H2.text(self.title)).kid(Em.text(self.subtitle));
+        let description = P.text(self.description);
 
-        let thumbnail_classes = "card-thumbnail rounded";
+        let card_contents = Div.kid(title_subtitle).kid(description);
+
+        let thumbnail_classes = "card-thumbnail rounded center";
 
         // The right hand side of the card might have various things,
         // which also determines the grid class.
@@ -232,14 +239,21 @@ impl PageBuilder {
         }
     }
 
-    pub fn series(mut self, url: &str, title: &str, description: &str, mut rhs: Rhs) -> Self {
+    pub fn series(
+        mut self,
+        url: &str,
+        title: &str,
+        subtitle: &str,
+        description: &str,
+        mut rhs: Rhs,
+    ) -> Self {
         let url = format!("{}/{url}", self.url);
 
         // url already has a leading slash.
         rhs.url_prefix(&format!("/static{url}"));
 
         self.series.push(Series::new(
-            Card::new(title, description, &url, rhs),
+            Card::new(title, subtitle, description, &url, rhs),
             vec![],
         ));
         self
@@ -249,6 +263,7 @@ impl PageBuilder {
         mut self,
         url: &str,
         title: &str,
+        subtitle: &str,
         description: &str,
         mut rhs: Rhs,
         mut contents: Article,
@@ -269,7 +284,7 @@ impl PageBuilder {
         contents.url_prefix = Some(static_url);
 
         current_series.posts.push(Post::new(
-            Card::new(title, description, &url, rhs),
+            Card::new(title, subtitle, description, &url, rhs),
             contents,
         ));
         self

@@ -158,7 +158,10 @@ impl NodeExt for Article {
                 }
 
                 Tidbit::Image(path) => {
-                    output.add_standalone(Img::new(&self.absolute_path(&path)));
+                    output.add_standalone(
+                        Img::new(&self.absolute_path(&path))
+                            .class("rounded breather-y center width-article-image"),
+                    );
                 }
                 Tidbit::Code(code) => {
                     output.add_standalone(Code.class("component-code rounded").text(code));

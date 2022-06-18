@@ -213,3 +213,19 @@ code * {
 .component-article h2:not(:first-child) {
   margin-top: 2rem;
 }
+
+.center {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.width-article-image {
+  width: 70%;
+}
+
+@media (max-width: 1000px) {
+  .width-article-image {
+    width: 100%;
+  }
+}
