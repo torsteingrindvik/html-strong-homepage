@@ -13,7 +13,7 @@ use tower_http::{
 use html_strong_homepage::{
     blender, blog,
     common::internal_server_error,
-    home,
+    herbs, home,
     page::{self, Rhs},
     training, Base, ContentUrl,
 };
@@ -154,11 +154,30 @@ pub async fn main() {
     )
     .build();
 
+    let herbs = page::PageBuilder::new("/herbs", "Herbs", "Let's try growing some of these!")
+        .series(
+            "basil",
+            "Basil",
+            "Homemade pesto yum",
+            "Posts about growing basil",
+            Rhs::Nothing,
+        )
+        .post(
+            "hello-world",
+            "Starting out",
+            "So what do you do exactly?",
+            "Starting out basil growth from a store bought mother plant.",
+            Rhs::Nothing,
+            herbs::basil::hello_world(),
+        )
+        .build();
+
     let app = Router::new()
         .route(&content_home.url(), get(home::home))
         .nest(blog.url(), blog.router())
         .nest(blender.url(), blender.router())
         .nest(training.url(), training.router())
+        .nest(herbs.url(), herbs.router())
         .route(
             "/favicon.ico",
             get_service(ServeFile::new("static/favicon.ico")).handle_error(internal_server_error),

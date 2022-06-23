@@ -1,16 +1,21 @@
 use std::fmt::Display;
 
 pub mod base;
+pub mod blender;
+pub mod blog;
 pub mod common;
 pub mod components;
+pub mod herbs;
+pub mod home;
 pub mod page;
+pub mod training;
 
 #[derive(Debug)]
 pub enum Base {
     Shared,
     Home,
     Blog,
-    Bus,
+    Herbs,
     Blender,
     Training,
 }
@@ -22,7 +27,7 @@ impl Display for Base {
             Base::Blender => "blender",
             Base::Shared => "shared",
             Base::Blog => "blog",
-            Base::Bus => "bus",
+            Base::Herbs => "herbs",
             Base::Training => "training",
         };
 
@@ -95,9 +100,3 @@ impl ContentUrl {
         Self::new(Base::Shared).css("shared.css")
     }
 }
-
-pub mod blender;
-pub mod blog;
-pub mod bus;
-pub mod home;
-pub mod training;

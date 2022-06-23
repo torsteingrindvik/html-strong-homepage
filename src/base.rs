@@ -60,7 +60,7 @@ pub fn html_doc<S: AsRef<str>>(
     let nav = Nav
         .kid(A::href(&ContentUrl::new(Base::Home).url()).text("Home 🏠"))
         .kid(A::href(&ContentUrl::new(Base::Blog).url()).text("Blog 📚"))
-        .kid(A::href(&ContentUrl::new(Base::Bus).url()).text("Bus 🚍"))
+        .kid(A::href(&ContentUrl::new(Base::Herbs).url()).text("Herbs 🌱"))
         .kid(A::href(&ContentUrl::new(Base::Blender).url()).text("Blender ⛰️"))
         .kid(A::href(&ContentUrl::new(Base::Training).url()).text("Training 🏋️"));
 

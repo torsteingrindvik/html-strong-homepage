@@ -80,8 +80,14 @@ pub fn block_characters() -> Article {
             "Profit!",
         ])
         .p("So on we go. Next up is creating a similar block character in a more female form.")
-        .p("We learned a trick! Placing the 3D cursor somewhere and using that as pivot point is nice.")
-        .p("Using that you can e.g. select many objects (like parts of an arm) and rotate around that pivot. Nice. Anyway, we got this:")
+        .p(
+            "We learned a trick! Placing the 3D cursor somewhere and using that as pivot point is \
+             nice.",
+        )
+        .p(
+            "Using that you can e.g. select many objects (like parts of an arm) and rotate around \
+             that pivot. Nice. Anyway, we got this:",
+        )
         .image("woman-final-maybe.webp")
         .p("Not too shabby.")
         .p("Then we got challenged to mess around with creating new characters.")

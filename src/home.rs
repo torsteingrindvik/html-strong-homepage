@@ -34,11 +34,7 @@ pub async fn home() -> Result<Html<String>, (StatusCode, String)> {
             "Blog 📚",
             "The blog will™ contain explorations of Rust stuff probably.",
         ))
-        .kid(Entry::new(
-            "Bus 🚍",
-            "This is just a shortcut for me to quickly check when the bus comes and goes.
-            HAH! Just kidding, I bought a car before I implemented this.",
-        ))
+        .kid(Entry::new("Herbs 🌱", "Let's grow these."))
         .kid(Entry::new(
             "Blender ⛰️",
             "If I ever git gud at Blender it would be fun to have some progress images.",
