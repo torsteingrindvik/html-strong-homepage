@@ -95,3 +95,23 @@ pub fn block_characters() -> Article {
         .p("So we ended up making a big guy. Now we have some kind of family:")
         .image("family.webp")
 }
+
+pub fn cyborg() -> Article {
+    Article::new()
+        .header("Cyborg")
+        .p("We start out by copying one of the previous models we have created.")
+        .p("Then we learn some nice tricks")
+        .list(vec![
+            "In edit mode, we can alt+leftclick an edge in edge mode to select a loop of edges",
+            "If we do that in face mode we select an entire loop of faces",
+            "Clicking i for inset allows us to... create insets, which can model neat stuff",
+            "Loop cuts are great",
+            "Extruding is cool, but also scary since it can mess up geometry if... I'm unlucky?",
+            "We can ctrl+E to have more extrude options, like extruding along face normals"
+        ])
+        .p("So the goal was to create a cyborg by using the above tricks. This was fun, almost like drawing badass characters as a kid on paper. Look:")
+        .image("cyborg.webp")
+        .p("Fun!")
+        .p("I also know there is something called a three point light, but no idea how that's supposed to be set up.")
+        .p("I added three lights in a triangular fashion around the character and added some colors to them.")
+}

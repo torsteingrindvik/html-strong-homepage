@@ -96,6 +96,14 @@ pub async fn main() {
         Rhs::one_image("trace-leg.webp"),
         blender::low_poly_characters::block_characters(),
     )
+    .post(
+        "cyborg",
+        "Cyborg",
+        "2022-06-23",
+        "Having some fun, creating a cyborg!",
+        Rhs::one_image("cyborg.webp"),
+        blender::low_poly_characters::cyborg(),
+    )
     .build();
 
     let training = page::PageBuilder::new(
