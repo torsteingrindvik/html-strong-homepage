@@ -160,14 +160,14 @@ pub async fn main() {
             "Basil",
             "Homemade pesto yum",
             "Posts about growing basil",
-            Rhs::Nothing,
+            Rhs::one_image("hello-world/mother-plant.webp"),
         )
         .post(
             "hello-world",
             "Starting out",
             "So what do you do exactly?",
             "Starting out basil growth from a store bought mother plant.",
-            Rhs::Nothing,
+            Rhs::one_image("pesto.webp"),
             herbs::basil::hello_world(),
         )
         .build();
