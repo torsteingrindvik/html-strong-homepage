@@ -48,3 +48,44 @@ pub fn simple_character() -> Article {
         .p("This was pretty fun! The character turned out pretty Playstation-1-esque?")
         .p("If we knew how to do rigging and animations, this would be even more fun!")
 }
+
+pub fn block_characters() -> Article {
+    Article::new()
+        .header("Block characters")
+        .p("We start fresh, and we will be using two reference images provided in the tutorial.")
+        .p("The first is female-like:")
+        .image("block-female.webp")
+        .p("Then male-like:")
+        .image("block-male.webp")
+        .p(
+            "Now we learn how to use some loop cuts to make more vertices, and we edit points in \
+             edit mode and so on. After a while we have something like",
+        )
+        .image("trace-leg.webp")
+        .p(
+            "But when we do work we normally use one of the orthogonal views with transparent \
+             geometry (rendered solid in the following):",
+        )
+        .image("trace-leg-ortho.webp")
+        .p("After some work, we arrive here:")
+        .image("male-final-maybe.webp")
+        .p("Pretty cool I think!")
+        .p("We learned a really nice trick.")
+        .list(vec![
+            "Select lots of objects, they have a red outline",
+            "The last object will have an orange outline; it is the active selection",
+            "If you ctrl+L, you can \"link\" stuff",
+            "This includes linking modifiers",
+            "So you can e.g. make many arm-parts mirrored in the same way",
+            "Profit!",
+        ])
+        .p("So on we go. Next up is creating a similar block character in a more female form.")
+        .p("We learned a trick! Placing the 3D cursor somewhere and using that as pivot point is nice.")
+        .p("Using that you can e.g. select many objects (like parts of an arm) and rotate around that pivot. Nice. Anyway, we got this:")
+        .image("woman-final-maybe.webp")
+        .p("Not too shabby.")
+        .p("Then we got challenged to mess around with creating new characters.")
+        .p("So let's try that, and let's not use reference images and see how we fare.")
+        .p("So we ended up making a big guy. Now we have some kind of family:")
+        .image("family.webp")
+}

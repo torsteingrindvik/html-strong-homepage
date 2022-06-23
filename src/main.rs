@@ -77,7 +77,7 @@ pub async fn main() {
         "Hello lowpoly character world!",
         "2022-06-15",
         "Starting out this tutorial, let's see how far we get.",
-        Rhs::two_images("start.webp", "adding-objects.webp"),
+        Rhs::one_image("adding-objects.webp"),
         blender::low_poly_characters::hello_world(),
     )
     .post(
@@ -85,8 +85,16 @@ pub async fn main() {
         "Simple character",
         "2022-06-16",
         "Making simple blocky characters.",
-        Rhs::two_images("start.webp", "color-characters.webp"),
+        Rhs::one_image("cool-character.webp"),
         blender::low_poly_characters::simple_character(),
+    )
+    .post(
+        "block-characters",
+        "Block Characters",
+        "2022-06-18",
+        "Using reference images to trace some slightly more advanced characters.",
+        Rhs::one_image("trace-leg.webp"),
+        blender::low_poly_characters::block_characters(),
     )
     .build();
 
