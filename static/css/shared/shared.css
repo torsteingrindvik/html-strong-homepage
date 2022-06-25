@@ -1,3 +1,9 @@
+:root {
+  --smol: 0.5rem;
+  --normal: calc(2 * var(--smol));
+  --big: calc(2 * var(--normal));
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -36,20 +42,14 @@ footer {
 }
 
 .base-body {
-  width: 100%;
-  max-width: 50%;
+  max-width: 80ch;
+
+  padding: 0 var(--normal);
 
   /* These two center content! */
-  margin-left: auto;
-  margin-right: auto;
+  margin: 0 auto;
 
   grid-row: 2;
-}
-
-@media (max-width: 1000px) {
-  .base-body {
-    max-width: 90%;
-  }
 }
 
 /* Style the links inside the navigation bar */
@@ -57,9 +57,9 @@ footer {
   float: left;
   color: #f2f2f2;
   text-align: center;
-  padding: 1rem 1rem;
+  padding: var(--normal) var(--normal);
   text-decoration: none;
-  font-size: 1rem;
+  font-size: var(--normal);
 }
 
 /* Change the color of links on hover */
@@ -85,7 +85,7 @@ footer {
 }
 
 .rounded {
-  border-radius: 0.5rem;
+  border-radius: var(--smol);
 }
 
 .ease {
@@ -97,40 +97,18 @@ footer {
   color: inherit;
 }
 
-.flex-row {
-  display: flex;
-  flex-direction: row;
-}
-
-.flex-column {
-  display: flex;
-  flex-direction: column;
-}
-
-.flex-wrap {
-  flex-wrap: wrap;
-}
-
-.margin-auto {
-  margin: auto;
-}
-
-.text-center {
-  text-align: center;
-}
-
 .breather-y {
-  margin-top: 2rem;
-  margin-bottom: 2rem;
+  margin-top: var(--big);
+  margin-bottom: var(--big);
 }
 
 .padding {
-  padding: 1rem;
+  padding: var(--normal);
 }
 
 .grid-4 {
   display: grid;
-  gap: 1rem;
+  gap: var(--normal);
   align-items: center;
 
   grid-template-rows: 1fr;
@@ -146,7 +124,7 @@ footer {
 
 .grid-3 {
   display: grid;
-  gap: 1rem;
+  gap: var(--normal);
   align-items: center;
 
   grid-template-rows: 1fr;
@@ -162,7 +140,7 @@ footer {
 
 .grid-2 {
   display: grid;
-  gap: 1rem;
+  gap: var(--normal);
   align-items: center;
 
   grid-template-rows: 1fr;
@@ -178,12 +156,7 @@ footer {
 
 .component-shell {
   background: rgb(231, 236, 226);
-  padding-left: 0.5rem;
-  padding-right: 0.5rem;
-}
-
-.blog-section p {
-  margin-bottom: 2rem;
+  padding: 0 var(--smol);
 }
 
 pre {
@@ -196,8 +169,8 @@ code * {
   font-weight: bold;
 }
 
-.language-rust {
-  line-height: 100%;
+.width-article-image {
+  width: 100%;
 }
 
 .card-thumbnail {
@@ -220,6 +193,6 @@ code * {
   margin-right: auto;
 }
 
-.width-article-image {
-  width: 100%;
+.language-rust {
+  line-height: 100%;
 }

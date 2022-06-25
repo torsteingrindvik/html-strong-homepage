@@ -73,7 +73,7 @@ pub fn html_doc<S: AsRef<str>>(
         .id("container")
         .kid(nav.class("base-nav"))
         .kid(body.class("base-body breather-y"))
-        .kid(footer.class("base-footer"));
+        .kid(footer);
 
     template::HtmlDocumentBuilder::new()
         .with_head(head)
