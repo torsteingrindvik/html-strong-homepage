@@ -39,12 +39,22 @@ async fn serve_tls(app: Router) {
 }
 
 #[cfg(feature = "tls")]
+async fn http_upgrade(uri: axum::http::Uri) -> axum::response::Redirect {
+    use axum::response::Redirect;
+
+    let uri = format!("https://torste.in:443{}", uri.path());
+    Redirect::temporary(&uri)
+}
+
+#[cfg(feature = "tls")]
 async fn serve_acme() {
-    let acme_app = Router::new().nest(
-        "/.well-known/acme-challenge",
-        get_service(ServeDir::new("acme/.well-known/acme-challenge"))
-            .handle_error(internal_server_error),
-    );
+    let acme_app = Router::new()
+        .nest(
+            "/.well-known/acme-challenge",
+            get_service(ServeDir::new("acme/.well-known/acme-challenge"))
+                .handle_error(internal_server_error),
+        )
+        .fallback(get(http_upgrade));
 
     serve(acme_app).await
 }
