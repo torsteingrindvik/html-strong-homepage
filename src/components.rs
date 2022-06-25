@@ -76,8 +76,11 @@ impl Article {
     }
 
     /// Adds a new YouTube video under the current section.
-    pub fn youtube(self, url: &'static str) -> Self {
-        self.add_tidbit(Tidbit::Youtube(url.into()))
+    pub fn youtube(self, _url: &'static str) -> Self {
+        unimplemented!(
+            "Youtube embeds bring SO much garbage into the site load so screw that"
+        );
+        // self.add_tidbit(Tidbit::Youtube(url.into()))
     }
 
     /// Adds a new unordered list of text items.
@@ -153,7 +156,7 @@ impl NodeExt for Article {
             match tidbit {
                 Tidbit::Url { url, text } => {
                     output.continue_paragraph(ParagraphContent::kid(
-                        A::href(&self.absolute_path(&url)).text(text),
+                        A::href(url).text(text),
                     ));
                 }
 

@@ -2,10 +2,9 @@ use crate::components::Article;
 
 pub fn huberman_podcast_with_andy_galpin() -> Article {
     Article::new()
-        .header("Video")
-        .youtube("https://www.youtube.com/embed/IAnhFUUCq6c")
         .header("Adaptations of Exercise, Progressive Overload")
-        .p("Needs progressive overload, stress. More weight, more reps, more often etc.")
+        .url("https://www.youtube.com/embed/IAnhFUUCq6c", " YouTube link.")
+        .p(" Needs progressive overload, stress. More weight, more reps, more often etc.")
         .header("Modifiable Variables, One-Rep Max, Muscle Soreness")
         .p("Exercise choice != adaptation. Sets, reps, rest time etc. affects adaptation.")
         .p(
@@ -94,10 +93,9 @@ pub fn huberman_podcast_with_andy_galpin() -> Article {
 
 pub fn eating_for_hypertrophy() -> Article {
     Article::new()
-        .header("Video")
-        .youtube("https://www.youtube.com/embed/0fCtyTChU_U")
         .header("Hypertrophy eating")
-        .p("Need caloric surplus. 10-15% caloric surplus is the research.")
+        .url("https://www.youtube.com/embed/0fCtyTChU_U", "YouTube link.")
+        .p(" Need caloric surplus. 10-15% caloric surplus is the research.")
         .p("2-4g/kg proteins. 2g considered low end for hypertrophy.")
         .p("Need high quality proteins. 700-3000mg leucine? Total proteins?")
         .p("Number of meals? Who knows. >=3 min is probably ok.")
@@ -106,10 +104,9 @@ pub fn eating_for_hypertrophy() -> Article {
 
 pub fn new_science_of_muscle_hypertrophy_1() -> Article {
     Article::new()
-        .header("Video")
-        .youtube("https://www.youtube.com/embed/MyKrc-fheBw")
         .header("How much muscle grows (9:05)")
-        .p("5-20% muscle volume mass in first 8-16 weeks")
+        .url("https://www.youtube.com/embed/MyKrc-fheBw", "YouTube link.")
+        .p(" 5-20% muscle volume mass in first 8-16 weeks")
         .header("Is the growth uniform across the muscle? (9:50)")
         .p("Probably not")
         .header("Show you ACTUAL elite athlete muscle fibers (15:00)")
@@ -147,11 +144,10 @@ pub fn new_science_of_muscle_hypertrophy_1() -> Article {
 
 pub fn new_science_of_muscle_hypertrophy_2() -> Article {
     Article::new()
-        .header("Video")
-        .youtube("https://www.youtube.com/embed/-FR5CQhsDg4")
         .header("5 Steps To Activating Muscle Growth")
+        .url("https://www.youtube.com/embed/-FR5CQhsDg4", "YouTube link.")
         .p(
-            "1: Stimulus. Of the muscle cell membrane. Mechanical tension, by lifting 'heavy' \
+            " 1: Stimulus. Of the muscle cell membrane. Mechanical tension, by lifting 'heavy' \
              (30-60%+ of 1RM",
         )
         .p(
@@ -203,10 +199,9 @@ pub fn new_science_of_muscle_hypertrophy_2() -> Article {
 
 pub fn new_science_of_muscle_hypertrophy_3() -> Article {
     Article::new()
-        .header("Video")
-        .youtube("https://www.youtube.com/embed/cw6XPWaEK20")
         .header("How many calories for muscle growth")
-        .p("10-15% surplus at least")
+        .url("https://www.youtube.com/embed/cw6XPWaEK20", "YouTube link.")
+        .p(" 10-15% surplus at least")
         .p("Carbohydrates: 4-7g/kg")
         .p("Fat: 1g/kg")
         .p("Protein: 2-4g/kg. Most important. Move fat/carbs around with proteins pinned.")

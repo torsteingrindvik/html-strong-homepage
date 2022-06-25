@@ -173,7 +173,7 @@ pub async fn main() {
         .post(
             "hello-world",
             "Starting out",
-            "So what do you do exactly?",
+            "2022-06-23",
             "Starting out basil growth from a store bought mother plant.",
             Rhs::one_image("pesto.webp"),
             herbs::basil::hello_world(),
