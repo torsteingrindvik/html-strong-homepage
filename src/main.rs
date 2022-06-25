@@ -194,6 +194,10 @@ pub async fn main() {
             "/static",
             get_service(ServeDir::new("static")).handle_error(internal_server_error),
         )
+        .nest(
+            "/.well-known/acme-challenge",
+            get_service(ServeDir::new("acme/.well-known/acme-challenge")).handle_error(internal_server_error),
+        )
         .layer(
             ServiceBuilder::new()
                 .layer(TraceLayer::new_for_http())
