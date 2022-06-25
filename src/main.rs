@@ -18,6 +18,37 @@ use html_strong_homepage::{
     training, Base, ContentUrl,
 };
 
+#[cfg(feature = "tls")]
+async fn serve(app: Router) {
+    use axum_server::tls_rustls::RustlsConfig;
+
+    let addr = SocketAddr::from(([0, 0, 0, 0], 443));
+    println!("listening on {}", addr);
+
+    let config = RustlsConfig::from_pem_file(
+        "/etc/letsencrypt/live/torste.in/fullchain.pem",
+        "/etc/letsencrypt/live/torste.in/privkey.pem",
+    )
+    .await
+    .unwrap();
+
+    axum_server::bind_rustls(addr, config)
+        .serve(app.into_make_service())
+        .await
+        .unwrap();
+}
+
+#[cfg(not(feature = "tls"))]
+async fn serve(app: Router) {
+    let addr = SocketAddr::from(([0, 0, 0, 0], 80));
+    println!("listening on {}", addr);
+
+    axum::Server::bind(&addr)
+        .serve(app.into_make_service())
+        .await
+        .unwrap();
+}
+
 #[tokio::main]
 pub async fn main() {
     tracing_subscriber::fmt::init();
@@ -196,7 +227,8 @@ pub async fn main() {
         )
         .nest(
             "/.well-known/acme-challenge",
-            get_service(ServeDir::new("acme/.well-known/acme-challenge")).handle_error(internal_server_error),
+            get_service(ServeDir::new("acme/.well-known/acme-challenge"))
+                .handle_error(internal_server_error),
         )
         .layer(
             ServiceBuilder::new()
@@ -205,10 +237,5 @@ pub async fn main() {
                 .layer(ConcurrencyLimitLayer::new(64)),
         );
 
-    let addr = SocketAddr::from(([0, 0, 0, 0], 8000));
-    println!("listening on {}", addr);
-    axum::Server::bind(&addr)
-        .serve(app.into_make_service())
-        .await
-        .unwrap();
+    serve(app).await
 }
