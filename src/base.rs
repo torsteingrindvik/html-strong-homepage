@@ -28,6 +28,9 @@ pub fn html_doc<S: AsRef<str>>(
     // Use html-strong's base head template.
     let mut head = template::head();
 
+    // Add favicon svg.
+    head.push_kid(Link::icon("/favicon.ico"));
+
     // Add stylesheets.
     if let Some(css) = css {
         for css in css {
