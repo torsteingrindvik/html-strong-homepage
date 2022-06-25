@@ -19,7 +19,7 @@ use html_strong_homepage::{
 };
 
 #[cfg(feature = "tls")]
-async fn serve(app: Router) {
+async fn serve_tls(app: Router) {
     use axum_server::tls_rustls::RustlsConfig;
 
     let addr = SocketAddr::from(([0, 0, 0, 0], 443));
@@ -38,7 +38,17 @@ async fn serve(app: Router) {
         .unwrap();
 }
 
-#[cfg(not(feature = "tls"))]
+#[cfg(feature = "tls")]
+async fn serve_acme() {
+    let acme_app = Router::new().nest(
+        "/.well-known/acme-challenge",
+        get_service(ServeDir::new("acme/.well-known/acme-challenge"))
+            .handle_error(internal_server_error),
+    );
+
+    serve(acme_app).await
+}
+
 async fn serve(app: Router) {
     let addr = SocketAddr::from(([0, 0, 0, 0], 80));
     println!("listening on {}", addr);
@@ -225,11 +235,6 @@ pub async fn main() {
             "/static",
             get_service(ServeDir::new("static")).handle_error(internal_server_error),
         )
-        .nest(
-            "/.well-known/acme-challenge",
-            get_service(ServeDir::new("acme/.well-known/acme-challenge"))
-                .handle_error(internal_server_error),
-        )
         .layer(
             ServiceBuilder::new()
                 .layer(TraceLayer::new_for_http())
@@ -237,5 +242,12 @@ pub async fn main() {
                 .layer(ConcurrencyLimitLayer::new(64)),
         );
 
-    serve(app).await
+    // If using TLS, we need to have a separate
+    // server running on port 80 for Let's Encrypt to be able
+    // to renew.
+    #[cfg(feature = "tls")]
+    tokio::join!(serve_tls(app), serve_acme());
+
+    #[cfg(not(feature = "tls"))]
+    serve(app).await;
 }
