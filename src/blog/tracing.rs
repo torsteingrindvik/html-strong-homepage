@@ -1,8 +1,10 @@
-use crate::components::Article;
+use crate::{components::Article, listing::Source};
 
 pub fn intro() -> Article {
+    let source = Source::new("code/tracing-explore/src/bin/threads.rs");
+
     Article::new()
-        .header("Tracing: An overview")
+        .h2("Tracing: An overview")
         .p("Tokio ")
         .url("https://github.com/tokio-rs/tracing", "tracing")
         .p(
@@ -18,12 +20,14 @@ pub fn intro() -> Article {
              don't know the answers, and as such the goals might not be accurate until I know \
              enough to refine them.",
         )
-        .header("Goals")
+        .h2("Goals")
         .p(
             "There are several goals I'd like to achieve by investigating tracing. The goals can \
              be split into a few categories, so let's do that.",
         )
-        .header("Goal: Understanding tracing itself")
+        .code(source.listing(1))
+        .code(source.listing("main"))
+        .h3("Goal: Understanding tracing itself")
         .p("I'd like to understand the concepts better.")
         .list(vec![
             "What is a subscriber?",
@@ -39,7 +43,7 @@ pub fn intro() -> Article {
             "How is global state managed? Specifically, how does logging interact with a global \
              subscriber?",
         ])
-        .header("Practical goal: Making distributed traces")
+        .h3("Practical goal: Making distributed traces")
         .p(
             "I want to know how I can make an application where I have some servers with clients \
              talking to each server, and end up with traces which are scoped in such a way that \
@@ -50,7 +54,7 @@ pub fn intro() -> Article {
              for happy connections, and higher verbosity if an error occurs in misbehaving \
              connections?",
         )
-        .header("Goal: The relationship with OpenTelemetry")
+        .h3("Goal: The relationship with OpenTelemetry")
         .p("For having this neat overview of distributed traces, I think ")
         .url("https://opentelemetry.io/docs/", "OpenTelemetry")
         .p(

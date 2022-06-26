@@ -2,7 +2,7 @@ use crate::components::Article;
 
 pub fn hello_world() -> Article {
     Article::new()
-        .header("Hello World")
+        .h2("Hello World")
         .p("So we bought a mother plant from the store.")
         .p("Then we learned a lot from ")
         .url("https://www.youtube.com/embed/byoEBdVoVpM", "this")
@@ -28,7 +28,7 @@ pub fn hello_world() -> Article {
             "We cut right above a nice split, to encourage more of that.",
             "So the top will be a type of 'knot'",
         ])
-        .header("Starting setup")
+        .h2("Starting setup")
         .p("We took four wine glasses with water and put some cuttings into them.")
         .p("The mother plant is then left like so:")
         .image("mother-plant.webp")
@@ -41,7 +41,7 @@ pub fn hello_world() -> Article {
         .p("Root view:")
         .image("conservatory-root-view.webp")
         .p("Now they will stay like this for 2-3 weeks, so let's wait a few days and then have a look at some progress pictures.")
-        .header("First try: Pesto")
+        .h2("First try: Pesto")
         .p("We had some actual basil to use for food, but not too much. Anyway we got to try making some pesto! ")
         .url("https://www.youtube.com/embed/oyh3jYKZ0E8", "This")
         .p(" video was helpful.")

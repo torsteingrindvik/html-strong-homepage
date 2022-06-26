@@ -1,14 +1,17 @@
 use html_strong::{document_tree::Node, science_lab::NodeExt, tags::*};
 
+use crate::listing::Listing;
+
 #[derive(Debug, Clone)]
 pub enum Tidbit {
     Text(String),
     Url { url: String, text: String },
     Image(String),
-    Code(String),
+    Code(Listing),
     Shell(String),
     Youtube(String),
-    Section(String),
+    H2(String),
+    H3(String),
     List(Vec<String>),
 }
 
@@ -41,38 +44,43 @@ impl Article {
     }
 
     /// Add paragraph text.
-    pub fn p(self, text: &'static str) -> Self {
+    pub fn p(self, text: &str) -> Self {
         self.add_tidbit(Tidbit::Text(text.into()))
     }
 
     /// Adds code.
     /// Is displayed in its own area.
-    pub fn code(self, text: &'static str) -> Self {
-        self.add_tidbit(Tidbit::Code(text.into()))
+    pub fn code(self, listing: Listing) -> Self {
+        self.add_tidbit(Tidbit::Code(listing))
     }
 
     /// Adds an image.
     /// Is displayed in its own area.
-    pub fn image(self, path: &'static str) -> Self {
+    pub fn image(self, path: &str) -> Self {
         self.add_tidbit(Tidbit::Image(path.into()))
     }
 
     /// This adds an inline shell-like command.
-    pub fn shell(self, command: &'static str) -> Self {
+    pub fn shell(self, command: &str) -> Self {
         self.add_tidbit(Tidbit::Shell(html_escape::encode_text(command).to_string()))
     }
 
     /// This adds an inline url.
-    pub fn url(self, url: &'static str, text: &'static str) -> Self {
+    pub fn url(self, url: &str, text: &str) -> Self {
         self.add_tidbit(Tidbit::Url {
             url: url.into(),
             text: text.into(),
         })
     }
 
-    /// Add a new header.
-    pub fn header(self, text: &'static str) -> Self {
-        self.add_tidbit(Tidbit::Section(text.into()))
+    /// Add an h2 element.
+    pub fn h2(self, text: &str) -> Self {
+        self.add_tidbit(Tidbit::H2(text.into()))
+    }
+
+    /// Add an h3 element.
+    pub fn h3(self, text: &str) -> Self {
+        self.add_tidbit(Tidbit::H3(text.into()))
     }
 
     /// Adds a new YouTube video under the current section.
@@ -167,7 +175,8 @@ impl NodeExt for Article {
                     );
                 }
                 Tidbit::Code(code) => {
-                    output.add_standalone(Code.class("component-code rounded").text(code));
+                    // output.add_standalone(Code.class("component-code rounded").text(code));
+                    output.add_standalone(code.clone());
                 }
                 Tidbit::Shell(command) => {
                     output.continue_paragraph(ParagraphContent::kid(
@@ -186,7 +195,8 @@ impl NodeExt for Article {
                 Tidbit::Youtube(url) => {
                     output.add_standalone(Iframe::new(&url));
                 }
-                Tidbit::Section(title) => output.add_standalone(H2.text(&title)),
+                Tidbit::H2(title) => output.add_standalone(H2.text(&title)),
+                Tidbit::H3(title) => output.add_standalone(H3.text(&title)),
                 Tidbit::List(text_list) => {
                     let mut list = Ul.into_node();
                     for text in text_list {

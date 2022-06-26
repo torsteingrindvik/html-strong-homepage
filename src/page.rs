@@ -36,7 +36,6 @@ impl Rhs {
     }
 
     fn url_prefix(&mut self, prefix: &str) {
-        println!("Updating wiht {prefix}");
         match self {
             Rhs::OneImage { path } => *path = format!("{prefix}/{path}"),
             Rhs::TwoImages { path1, path2 } => {
@@ -49,7 +48,7 @@ impl Rhs {
 }
 
 #[derive(Debug, Clone)]
-struct Card {
+pub struct Card {
     /// Card title.
     title: String,
 
@@ -67,7 +66,17 @@ struct Card {
 }
 
 impl Card {
-    fn new(title: &str, subtitle: &str, description: &str, url: &str, rhs: Rhs) -> Self {
+    /// A card.
+    /// 
+    /// # Example
+    /// 
+    /// ```rust
+    /// use html_strong_homepage::page::{Card, Rhs};
+    /// 
+    /// // Creates a card with nothing displayed on the right-hand side.
+    /// let card = Card::new("My Card", "2022-06-26", "This is my card", "nrk.no", Rhs::Nothing);
+    /// ```
+    pub fn new(title: &str, subtitle: &str, description: &str, url: &str, rhs: Rhs) -> Self {
         Self {
             title: title.to_string(),
             subtitle: subtitle.to_string(),

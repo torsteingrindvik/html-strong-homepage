@@ -2,7 +2,7 @@ use crate::components::Article;
 
 pub fn hello_world() -> Article {
     Article::new()
-        .header("Let's get started")
+        .h2("Let's get started")
         .p(
             "Got distracted by looking at audio pre-amps and then Apex Legends, but at least now \
              we've started!",
@@ -20,7 +20,7 @@ pub fn hello_world() -> Article {
 
 pub fn simple_character() -> Article {
     Article::new()
-        .header("Simple character")
+        .h2("Simple character")
         .p("Now we start over.")
         .p("So we start making simple characters now. We end up doing this:")
         .image("simple-character.webp")
@@ -51,7 +51,7 @@ pub fn simple_character() -> Article {
 
 pub fn block_characters() -> Article {
     Article::new()
-        .header("Block characters")
+        .h2("Block characters")
         .p("We start fresh, and we will be using two reference images provided in the tutorial.")
         .p("The first is female-like:")
         .image("block-female.webp")
@@ -98,7 +98,7 @@ pub fn block_characters() -> Article {
 
 pub fn cyborg() -> Article {
     Article::new()
-        .header("Cyborg")
+        .h2("Cyborg")
         .p("We start out by copying one of the previous models we have created.")
         .p("Then we learn some nice tricks")
         .list(vec![

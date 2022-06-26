@@ -10,6 +10,8 @@ pub mod home;
 pub mod page;
 pub mod training;
 
+pub mod listing;
+
 #[derive(Debug)]
 pub enum Base {
     Shared,
