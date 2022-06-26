@@ -40,13 +40,29 @@ impl NodeExt for Listing {
         let title = Div
             .class("text-center")
             .kid(Em.text(format!("Listing {}: \"{}\"", self.index, self.name)));
-        let code = Div.kid(Pre.kid(Code.class("language-rust").text(self.code)));
+
+        let link = A::href(&format!(
+            "https://github.com/torsteingrindvik/html-strong-homepage/blob/main/{}#L{}-L{}",
+            self.file, self.start, self.end
+        ))
+        .with_target(a::Target::Blank)
+        .class("code-link")
+        .kid(Img::new_sized("/static/gh_light.png", 24, 24).class("ease"));
+
+        let code = Div
+            .style("position: relative;")
+            .kid(Pre.kid(Code.class("language-rust").text(self.code)))
+            .kid(link);
+
         let subtitle = Div.class("text-center").kid(Em.text(format!(
             "Source: {}, lines {}-{}",
             self.file, self.start, self.end
         )));
 
-        Div.class("breather-y").kid(title).kid(code).kid(subtitle)
+        Div.class("code-listing breather-y")
+            .kid(title)
+            .kid(code)
+            .kid(subtitle)
     }
 }
 

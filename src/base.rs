@@ -75,7 +75,7 @@ pub fn html_doc<S: AsRef<str>>(
     let body = Body
         .id("container")
         .kid(nav.class("base-nav"))
-        .kid(body.class("base-body breather-y"))
+        .kid(Main.kid(body.class("base-body breather-y")))
         .kid(footer);
 
     template::HtmlDocumentBuilder::new()

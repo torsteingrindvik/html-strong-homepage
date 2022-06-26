@@ -10,6 +10,9 @@
   box-sizing: border-box;
 }
 
+main {
+  min-width: 0;
+}
 
 #container {
   width: 100%;
@@ -168,7 +171,6 @@ pre {
 pre > code {
   border-radius: var(--smol);
   font-family: "Comic Mono", "Sans Mono", "Consolas", "Courier", monospace;
-  font-weight: bold;
 }
 
 .width-article-image {
@@ -205,4 +207,14 @@ pre > code {
 
 .text-center {
   text-align: center;
+}
+
+.code-link {
+  position: absolute;
+  top: var(--smol);
+  right: var(--smol);
+}
+
+.code-listing img:hover {
+  transform: scale(1.3);
 }
