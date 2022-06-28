@@ -18,6 +18,7 @@ reqwest = { version = "0.11", features = ["json"] }
 html-escape = "0.2.11"
 
 axum-server = { version = "0.3", features = ["tls-rustls"], optional = true }
+cached = "0.34.1"
 
 [features]
 tls = ["axum-server"]

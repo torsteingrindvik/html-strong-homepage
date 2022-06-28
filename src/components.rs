@@ -13,6 +13,7 @@ pub enum Tidbit {
     H2(String),
     H3(String),
     List(Vec<String>),
+    Breather,
 }
 
 #[derive(Debug, Clone)]
@@ -46,6 +47,11 @@ impl Article {
     /// Add paragraph text.
     pub fn p(self, text: &str) -> Self {
         self.add_tidbit(Tidbit::Text(text.into()))
+    }
+
+    /// Add a br.
+    pub fn br(self) -> Self {
+        self.add_tidbit(Tidbit::Breather)
     }
 
     /// Adds code.
@@ -85,9 +91,7 @@ impl Article {
 
     /// Adds a new YouTube video under the current section.
     pub fn youtube(self, _url: &'static str) -> Self {
-        unimplemented!(
-            "Youtube embeds bring SO much garbage into the site load so screw that"
-        );
+        unimplemented!("Youtube embeds bring SO much garbage into the site load so screw that");
         // self.add_tidbit(Tidbit::Youtube(url.into()))
     }
 
@@ -99,6 +103,12 @@ impl Article {
                 .map(|s| s.as_ref().to_string())
                 .collect::<Vec<String>>(),
         ))
+    }
+}
+
+impl Default for Article {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -163,14 +173,12 @@ impl NodeExt for Article {
         for tidbit in &self.stuff {
             match tidbit {
                 Tidbit::Url { url, text } => {
-                    output.continue_paragraph(ParagraphContent::kid(
-                        A::href(url).text(text),
-                    ));
+                    output.continue_paragraph(ParagraphContent::kid(A::href(url).text(text)));
                 }
 
                 Tidbit::Image(path) => {
                     output.add_standalone(
-                        Img::new(&self.absolute_path(&path))
+                        Img::new(&self.absolute_path(path))
                             .class("rounded breather-y center width-article-image"),
                     );
                 }
@@ -193,7 +201,7 @@ impl NodeExt for Article {
                     output.continue_paragraph(ParagraphContent::text(text.to_string()));
                 }
                 Tidbit::Youtube(url) => {
-                    output.add_standalone(Iframe::new(&url));
+                    output.add_standalone(Iframe::new(url));
                 }
                 Tidbit::H2(title) => output.add_standalone(H2.text(&title)),
                 Tidbit::H3(title) => output.add_standalone(H3.text(&title)),
@@ -204,6 +212,7 @@ impl NodeExt for Article {
                     }
                     output.add_standalone(list)
                 }
+                Tidbit::Breather => output.add_standalone(Br),
             };
 
             // If we know if the last tidbit was a paragraph/text,

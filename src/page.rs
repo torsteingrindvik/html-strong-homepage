@@ -67,12 +67,12 @@ pub struct Card {
 
 impl Card {
     /// A card.
-    /// 
+    ///
     /// # Example
-    /// 
+    ///
     /// ```rust
     /// use html_strong_homepage::page::{Card, Rhs};
-    /// 
+    ///
     /// // Creates a card with nothing displayed on the right-hand side.
     /// let card = Card::new("My Card", "2022-06-26", "This is my card", "nrk.no", Rhs::Nothing);
     /// ```
@@ -177,7 +177,7 @@ async fn render_page(node: Node) -> Result<Html<String>, (StatusCode, String)> {
         node,
     );
 
-    render(html).await
+    render(html)
 }
 
 async fn page(Extension(state): Extension<Page>) -> Result<Html<String>, (StatusCode, String)> {

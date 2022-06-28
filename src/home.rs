@@ -1,4 +1,5 @@
 use axum::response::Html;
+use cached::proc_macro::cached;
 use html_strong::{document_tree::Node, science_lab::NodeExt, tags::*};
 use reqwest::StatusCode;
 
@@ -26,7 +27,8 @@ impl NodeExt for Entry {
     }
 }
 
-pub async fn home() -> Result<Html<String>, (StatusCode, String)> {
+#[cached(size = 1, result = true)]
+fn home_impl() -> Result<Html<String>, (StatusCode, String)> {
     let contents = Div
         .kid(H1.text("torstein's homepage"))
         .kid(P.text("It's my homepage."))
@@ -46,5 +48,9 @@ pub async fn home() -> Result<Html<String>, (StatusCode, String)> {
 
     let html = html_doc::<String>(None, None, None, contents);
 
-    render(html).await
+    render(html)
+}
+
+pub async fn home() -> Result<Html<String>, (StatusCode, String)> {
+    home_impl()
 }

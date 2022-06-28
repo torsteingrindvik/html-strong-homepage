@@ -60,7 +60,7 @@ async fn serve_acme() {
 }
 
 async fn serve(app: Router) {
-    let addr = SocketAddr::from(([0, 0, 0, 0], 80));
+    let addr = SocketAddr::from(([0, 0, 0, 0], 8000));
     println!("listening on {}", addr);
 
     axum::Server::bind(&addr)

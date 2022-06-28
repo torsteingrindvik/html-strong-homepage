@@ -13,7 +13,7 @@ pub async fn no_such_page(path: String) -> (StatusCode, String) {
     (StatusCode::NOT_FOUND, format!("Page not found: {path}"))
 }
 
-pub async fn render(contents: Node) -> Result<Html<String>, (StatusCode, String)> {
+pub fn render(contents: Node) -> Result<Html<String>, (StatusCode, String)> {
     let response = contents.render_string().map_err(|e| {
         (
             StatusCode::INTERNAL_SERVER_ERROR,
