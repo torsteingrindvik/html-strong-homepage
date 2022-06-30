@@ -1,3 +1,6 @@
+// Expanded from src/bin/log-macros.rs,
+// edited for legibility here and there, with listings added as well.
+
 #![feature(fmt_internals)]
 // listing 1: Not our stuff
 #![feature(prelude_import)]
@@ -73,8 +76,7 @@ fn _foo() {
     // ~listing
 
     // listing 5: Callsite initialization truncated
-    // By the way the docs show that this 👇
-    // implements the Callsite trait.
+    // This default impls the trait that got used FYI
     static CALLSITE: ::tracing::callsite::DefaultCallsite = {
         // ⚡Static⚡ stuff.
         static META: ::tracing::Metadata<'static> = {
@@ -86,16 +88,29 @@ fn _foo() {
     };
     // ~listing
 
-    // listing 6: Callsite initialization untruncated
-    static CALLSITE: ::tracing::callsite::DefaultCallsite = {
-        static META: ::tracing::Metadata<'static> = {
-            ::tracing_core::metadata::Metadata::new(
+    // listing 6: Callsite initialization truncated, but chill
+    // This default impls the trait that got used FYI
+    static CALLSITE: DefaultCallsite = {
+        // ⚡Static⚡ stuff.
+        static META: Metadata<'static> = {
+            Metadata::new(/* hold on */)
+        };
+
+        // Takes a ⚡static⚡ reference
+        DefaultCallsite::new(&META)
+    };
+    // ~listing
+
+    // listing 7: Callsite initialization untruncated
+    static CALLSITE: DefaultCallsite = {
+        static META: Metadata<'static> = {
+            Metadata::new(
                 // name
                 "event src/bin/log-macros.rs:6",
                 // target
                 "log_macros",
                 // level
-                ::tracing::Level::INFO,
+                INFO,
                 // file
                 Some("src/bin/log-macros.rs"),
                 // line
@@ -103,39 +118,63 @@ fn _foo() {
                 // module
                 Some("log_macros"),
                 // fields
-                ::tracing_core::field::FieldSet::new(
-                    &["message"],
-                    ::tracing_core::callsite::Identifier(&CALLSITE),
-                ),
+                FieldSet::new(&["message"], Identifier(&CALLSITE)),
                 // kind
-                ::tracing::metadata::Kind::EVENT,
+                Kind::EVENT,
             )
         };
 
-        ::tracing::callsite::DefaultCallsite::new(&META)
+        DefaultCallsite::new(&META)
     };
     // ~listing
 
-    let enabled = ::tracing::Level::INFO <= ::tracing::level_filters::STATIC_MAX_LEVEL
-        && ::tracing::Level::INFO <= ::tracing::level_filters::LevelFilter::current()
-        && {
-            let interest = CALLSITE.interest();
-            !interest.is_never()
-                && ::tracing::__macro_support::__is_enabled(CALLSITE.metadata(), interest)
-        };
+    // listing 8: Are we enabled
+    let enabled = INFO <= STATIC_MAX_LEVEL && INFO <= LevelFilter::current() && {
+        let interest = CALLSITE.interest();
+        !interest.is_never() && __is_enabled(CALLSITE.metadata(), interest)
+    };
     if enabled {
-        (|value_set: ::tracing::field::ValueSet| {
-            let meta = CALLSITE.metadata();
-            ::tracing::Event::dispatch(meta, &value_set);
-        })({
-            #[allow(unused_imports)]
-            use tracing::field::{debug, display, Value};
-            let mut iter = CALLSITE.metadata().fields().iter();
-            CALLSITE.metadata().fields().value_set(&[(
-                &iter.next().expect("FieldSet corrupted (this is a bug)"),
-                Some(&::core::fmt::Arguments::new_v1(&["Hey"], &[]) as &dyn Value),
-            )])
-        });
+        // Stuff
     } else {
     }
+    // ~listing
+
+    // listing 9: Enabled! What's next?
+    // So this 👇 block is fancy
+    (|value_set: ValueSet| {
+        let meta = CALLSITE.metadata();
+        Event::dispatch(meta, &value_set);
+    })
+    // (Fancy block end)
+    ({
+        use tracing::field::{debug, display, Value};
+        let mut iter = CALLSITE.metadata().fields().iter();
+        CALLSITE.metadata().fields().value_set(&[(
+            &iter.next().expect("FieldSet corrupted (this is a bug)"),
+            // Let's keep this qualified path since it's not from tracing and all
+            // of this seems a bit magic
+            Some(&::core::fmt::Arguments::new_v1(&["Hey"], &[]) as &dyn Value),
+        )])
+    });
+    // ~listing
+
+    // listing 10: Enabled! Closure called
+    (|value_set: ValueSet| {
+        let meta = CALLSITE.metadata();
+        Event::dispatch(meta, &value_set);
+    })
+    // ~listing
+
+    // listing 11: Enabled! Closure input
+    ({
+        use tracing::field::{debug, display, Value};
+        let mut iter = CALLSITE.metadata().fields().iter();
+        CALLSITE.metadata().fields().value_set(&[(
+            &iter.next().expect("FieldSet corrupted (this is a bug)"),
+            // Let's keep this qualified path since it's not from tracing and all
+            // of this seems a bit magic
+            Some(&::core::fmt::Arguments::new_v1(&["Hey"], &[]) as &dyn Value),
+        )])
+    });
+    // ~listing
 }

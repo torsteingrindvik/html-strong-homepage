@@ -107,11 +107,20 @@ pub fn cyborg() -> Article {
             "Clicking i for inset allows us to... create insets, which can model neat stuff",
             "Loop cuts are great",
             "Extruding is cool, but also scary since it can mess up geometry if... I'm unlucky?",
-            "We can ctrl+E to have more extrude options, like extruding along face normals"
+            "We can ctrl+E to have more extrude options, like extruding along face normals",
         ])
-        .p("So the goal was to create a cyborg by using the above tricks. This was fun, almost like drawing badass characters as a kid on paper. Look:")
+        .p(
+            "So the goal was to create a cyborg by using the above tricks. This was fun, almost \
+             like drawing badass characters as a kid on paper. Look:",
+        )
         .image("cyborg.webp")
         .p("Fun!")
-        .p("I also know there is something called a three point light, but no idea how that's supposed to be set up.")
-        .p("I added three lights in a triangular fashion around the character and added some colors to them.")
+        .p(
+            "I also know there is something called a three point light, but no idea how that's \
+             supposed to be set up.",
+        )
+        .p(
+            "I added three lights in a triangular fashion around the character and added some \
+             colors to them.",
+        )
 }

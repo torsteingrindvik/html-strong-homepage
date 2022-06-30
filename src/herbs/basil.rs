@@ -40,9 +40,15 @@ pub fn hello_world() -> Article {
         .image("conservatory-top-view.webp")
         .p("Root view:")
         .image("conservatory-root-view.webp")
-        .p("Now they will stay like this for 2-3 weeks, so let's wait a few days and then have a look at some progress pictures.")
+        .p(
+            "Now they will stay like this for 2-3 weeks, so let's wait a few days and then have a \
+             look at some progress pictures.",
+        )
         .h2("First try: Pesto")
-        .p("We had some actual basil to use for food, but not too much. Anyway we got to try making some pesto! ")
+        .p(
+            "We had some actual basil to use for food, but not too much. Anyway we got to try \
+             making some pesto! ",
+        )
         .url("https://www.youtube.com/embed/oyh3jYKZ0E8", "This")
         .p(" video was helpful.")
         .p("I learned that you put nuts and cheese into pesto.")

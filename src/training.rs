@@ -3,7 +3,10 @@ use crate::components::Article;
 pub fn huberman_podcast_with_andy_galpin() -> Article {
     Article::new()
         .h2("Adaptations of Exercise, Progressive Overload")
-        .url("https://www.youtube.com/embed/IAnhFUUCq6c", " YouTube link.")
+        .url(
+            "https://www.youtube.com/embed/IAnhFUUCq6c",
+            " YouTube link.",
+        )
         .p(" Needs progressive overload, stress. More weight, more reps, more often etc.")
         .h2("Modifiable Variables, One-Rep Max, Muscle Soreness")
         .p("Exercise choice != adaptation. Sets, reps, rest time etc. affects adaptation.")
