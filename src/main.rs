@@ -229,6 +229,14 @@ pub async fn main() {
             Rhs::one_image("pesto.webp"),
             herbs::basil::hello_world(),
         )
+        .post(
+            "death-and-decay",
+            "Death and Decay",
+            "2022-07-02",
+            "And... hope?",
+            Rhs::one_image("mother-plant.webp"),
+            herbs::basil::death_and_decay(),
+        )
         .build();
 
     let app = Router::new()
