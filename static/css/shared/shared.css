@@ -14,13 +14,24 @@ main {
   min-width: 0;
 }
 
+@font-face {
+  font-family: domine-local;
+  src: url("/static/fonts/Domine.woff");
+}
+
+@font-face {
+  font-family: comic-mono-local;
+  src: url("/static/fonts/ComicMono.woff");
+}
+
 #container {
   width: 100%;
   height: 100vh;
   display: grid;
   grid-template-rows: max-content auto max-content;
-  font-family: "Domine", serif;
   line-height: 200%;
+
+  font-family: domine-local;
 }
 
 /* Add a black background color to the top navigation */
@@ -170,7 +181,7 @@ pre {
 
 pre > code {
   border-radius: var(--smol);
-  font-family: "Comic Mono", "Sans Mono", "Consolas", "Courier", monospace;
+  font-family: comic-mono-local, "Comic Mono", "Sans Mono", "Consolas", "Courier", monospace;
 }
 
 .width-article-image {
@@ -202,7 +213,7 @@ pre > code {
 }
 
 .language-rust {
-  line-height: 125%;
+  line-height: 140%;
 }
 
 .text-center {

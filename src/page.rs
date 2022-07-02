@@ -167,11 +167,11 @@ struct Context {
 async fn render_page(node: Node) -> Result<Html<String>, (StatusCode, String)> {
     let html = html_doc(
         Some(vec![
-            "https://cdn.jsdelivr.net/npm/comic-mono@0.0.1/index.css",
-            "//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.1/styles/monokai.min.css",
+            // For highlight.js
+            "/static/css/shared/monokai.min.css",
         ]),
         Some(vec![
-            "//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.1/highlight.min.js",
+            "/static/js/highlight.min.js",
         ]),
         Some(vec!["hljs.highlightAll();"]),
         node,

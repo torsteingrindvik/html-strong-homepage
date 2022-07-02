@@ -38,11 +38,6 @@ pub fn html_doc<S: AsRef<str>>(
         }
     }
 
-    // Let's generally use the same font everywhere.
-    head.push_kid(Link::stylesheet(
-        "text/css",
-        "https://fonts.googleapis.com/css2?family=Domine:wght@500&display=swap",
-    ));
     // Always want the "base CSS" used for the top nav.
     head.push_kid(Link::stylesheet("text/css", &ContentUrl::base_css()));
 
