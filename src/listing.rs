@@ -153,16 +153,3 @@ impl Source {
         }
     }
 }
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn listing() {
-        let source = Source::new("code/tracing-explore/src/bin/threads.rs");
-
-        let listing = source.listing(1);
-        println!("{listing:#?}");
-    }
-}

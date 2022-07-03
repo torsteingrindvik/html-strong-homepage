@@ -124,3 +124,15 @@ pub fn cyborg() -> Article {
              colors to them.",
         )
 }
+
+pub fn cyborg_follow_up() -> Article {
+    Article::new()
+        .h2("Cyborg follow-up")
+        .p("Cyborg part of tutorial is done after this.")
+        .p("I learned about slots, which can be used to assign materials to a selection of faces on an object.")
+        .p("So I then used that to give certain faces emissive materials, which was also a part of the tutorial. Very fun:")
+        .image("cyborg-lights.webp")
+        .p("The tutorial does not include anything about animations, so I fumbled my way to do something:")
+        .video("cyborg-lights-animation.webm")
+        .p("The rotation messed up badly, but that's just funny. And we get to test video on the blog.")
+}

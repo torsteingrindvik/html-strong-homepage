@@ -14,6 +14,7 @@ pub enum Tidbit {
     H3(String),
     List(Vec<String>),
     Breather,
+    Video(String),
 }
 
 #[derive(Debug, Clone)]
@@ -64,6 +65,13 @@ impl Article {
     /// Is displayed in its own area.
     pub fn image(self, path: &str) -> Self {
         self.add_tidbit(Tidbit::Image(path.into()))
+    }
+
+    /// Adds a video with loop and controls.
+    /// Is displayed in its own area.
+    /// Should be webm.
+    pub fn video(self, path: &str) -> Self {
+        self.add_tidbit(Tidbit::Video(path.to_string()))
     }
 
     /// This adds an inline shell-like command.
@@ -179,11 +187,16 @@ impl NodeExt for Article {
                 Tidbit::Image(path) => {
                     output.add_standalone(
                         Img::new(&self.absolute_path(path))
-                            .class("rounded breather-y center width-article-image"),
+                            .class("rounded breather-y center width-100"),
                     );
                 }
+                Tidbit::Video(path) => output.add_standalone(
+                    Video::new()
+                        .controls()
+                        .loop_()
+                        .kid(Source::new_webm(self.absolute_path(path))).class("rounded breather-y width-100"),
+                ),
                 Tidbit::Code(code) => {
-                    // output.add_standalone(Code.class("component-code rounded").text(code));
                     output.add_standalone(code.clone());
                 }
                 Tidbit::Shell(command) => {
