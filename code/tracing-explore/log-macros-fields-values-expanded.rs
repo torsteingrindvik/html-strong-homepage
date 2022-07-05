@@ -108,3 +108,37 @@ static META: Metadata<'static> = {
     )
 };
 // ~listing
+
+fn foo() {
+    // listing 2: Dispatch event with fields, values
+    (|value_set: ValueSet| {
+        let meta = CALLSITE.metadata();
+        Event::dispatch(meta, &value_set);
+    })({
+        use tracing::field::{debug, display, Value};
+        let mut iter = CALLSITE.metadata().fields().iter();
+        CALLSITE.metadata().fields().value_set(&[
+            (
+                &iter.next().expect("FieldSet corrupted (this is a bug)"),
+                Some(&::core::fmt::Arguments::new_v1(&["Hey"], &[]) as &Value),
+            ),
+            (
+                &iter.next().expect("FieldSet corrupted (this is a bug)"),
+                Some(&123 as &Value),
+            ),
+            (
+                &iter.next().expect("FieldSet corrupted (this is a bug)"),
+                Some(&"Something" as &Value),
+            ),
+            (
+                &iter.next().expect("FieldSet corrupted (this is a bug)"),
+                Some(&debug(&MyStruct { _v: 10 }) as &Value),
+            ),
+            (
+                &iter.next().expect("FieldSet corrupted (this is a bug)"),
+                Some(&cat as &Value),
+            ),
+        ])
+    });
+}
+// ~listing
