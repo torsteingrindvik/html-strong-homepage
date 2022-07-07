@@ -205,7 +205,7 @@ async fn series(
     let mut content = Div.class("series");
 
     if let Some(series) = state.serie(&series_path) {
-        for post in &*series.posts() {
+        for post in series.posts().iter().rev() {
             content.push_kid(post.card.clone().class("breather-y"));
         }
         render_page(content.into_node()).await
