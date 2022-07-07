@@ -10,8 +10,11 @@ fn main() -> Result<()> {
         .filter_map(|e| e.ok())
         // We want to look at paths
         .map(|f| f.path().to_owned())
-        // Only care about png files
-        .filter(|f| f.extension().and_then(|ext| ext.to_str()) == Some("png".into()))
+        // Only care about png, jpg files
+        .filter(|f| {
+            f.extension().and_then(|ext| ext.to_str()) == Some("png".into())
+                || f.extension().and_then(|ext| ext.to_str()) == Some("jpg".into())
+        })
         // If it's already converted, don't do it again
         .filter(|f| !f.with_extension("webp").exists())
         .map(|f| (f.clone(), f.with_extension("webp")))

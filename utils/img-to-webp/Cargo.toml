@@ -1,5 +1,5 @@
 [package]
-name = "png-to-webp"
+name = "img-to-webp"
 version = "0.1.0"
 edition = "2021"
 
