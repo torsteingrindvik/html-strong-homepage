@@ -47,7 +47,7 @@ impl NodeExt for Listing {
         ))
         .with_target(a::Target::Blank)
         .class("code-link")
-        .kid(Img::new_sized("/static/gh_light.png", 24, 24).class("ease"));
+        .kid(Img::new_sized("/static/gh_light.webp", 24, 24).class("ease"));
 
         let code = Div
             .style("position: relative;")
