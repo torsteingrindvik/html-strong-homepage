@@ -47,7 +47,7 @@ impl Article {
 
     /// Add paragraph text.
     pub fn p(self, text: &str) -> Self {
-        self.add_tidbit(Tidbit::Text(text.into()))
+        self.add_tidbit(Tidbit::Text(html_escape::encode_text(text).to_string()))
     }
 
     /// Add a br.
@@ -194,7 +194,8 @@ impl NodeExt for Article {
                     Video::new()
                         .controls()
                         .loop_()
-                        .kid(Source::new_webm(self.absolute_path(path))).class("rounded breather-y width-100"),
+                        .kid(Source::new_webm(self.absolute_path(path)))
+                        .class("rounded breather-y width-100"),
                 ),
                 Tidbit::Code(code) => {
                     output.add_standalone(code.clone());

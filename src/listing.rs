@@ -30,7 +30,6 @@ pub struct Listing {
     file: String,
     code: String,
     name: String,
-    index: usize,
     start: usize,
     end: usize,
 }
@@ -39,7 +38,7 @@ impl NodeExt for Listing {
     fn into_node(self) -> Node {
         let title = Div
             .class("text-center")
-            .kid(Em.text(format!("Listing {}: \"{}\"", self.index, self.name)));
+            .kid(Em.text(format!("\"{}\"", self.name)));
 
         let link = A::href(&format!(
             "https://github.com/torsteingrindvik/html-strong-homepage/blob/main/{}#L{}-L{}",
@@ -51,7 +50,12 @@ impl NodeExt for Listing {
 
         let code = Div
             .style("position: relative;")
-            .kid(Pre.kid(Code.class("language-rust").text(self.code)))
+            .kid(
+                Pre.kid(
+                    Code.class("language-rust")
+                        .text(html_escape::encode_text(&self.code)),
+                ),
+            )
             .kid(link);
 
         let subtitle = Div.class("text-center").kid(Em.text(format!(
@@ -96,24 +100,16 @@ impl Source {
 
         // An example would be
         //
-        //  listing 2: main
+        //  listing: main
         //
         // We want to get the index (right before the colon) and name
         // (the stuff after).
-        let (prefix, listing_name) = self
+        let (_, listing_name) = self
             .lines()
             .nth(listing_start)
             .unwrap()
             .split_once(": ")
             .expect("listing should have `: ` in it");
-
-        let index = prefix
-            .split_whitespace()
-            .rev()
-            .next()
-            .expect("listing format should be normal")
-            .parse()
-            .expect("listing should have an index");
 
         // Now skip the line with the listing opener itself.
         let listing_start = listing_start + 1;
@@ -136,7 +132,6 @@ impl Source {
                 .join("\n"),
 
             name: listing_name.to_string(),
-            index,
 
             // Human readable line number means we don't want it 0-indexed, so add one.
             start: listing_start + 1,
