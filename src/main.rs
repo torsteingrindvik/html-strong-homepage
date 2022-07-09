@@ -253,6 +253,14 @@ pub async fn main() {
             Rhs::one_image("plants-filled.webp"),
             herbs::basil::big_changes(),
         )
+        .post(
+            "seeds",
+            "Seeds",
+            "2022-07-09",
+            "We spend money and other things happen.",
+            Rhs::one_image("whole-family.webp"),
+            herbs::basil::seeds(),
+        )
         .build();
 
     let app = Router::new()
