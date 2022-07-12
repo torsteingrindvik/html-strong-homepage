@@ -5,6 +5,7 @@ edition = "2021"
 
 [dependencies]
 html-strong = { path = "../html-strong" }
+shared = { path = "utils/shared" }
 
 axum = "0.5"
 axum-extra = { version = "0.2", features = ["cookie"] }

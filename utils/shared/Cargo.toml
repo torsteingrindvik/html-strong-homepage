@@ -1,0 +1,9 @@
+[package]
+name = "shared"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+serde = { version = "1.0.138", features = ["derive"] }
+chrono = { version = "0.4.19", features = ["serde"] }
+tracing = "0.1.32"

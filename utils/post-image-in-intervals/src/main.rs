@@ -1,17 +1,36 @@
 use std::{collections::VecDeque, time::Duration};
 
-use html_strong_homepage::{
-    herbs::{herbs_new_image_auth, HERBS_NEW_IMAGE_POST_ENDPOINT},
-    image::Image,
-};
 use reqwest::StatusCode;
+use shared::image::Image;
 use tracing::{info, warn};
 
 const SECONDS_INTERVAL: u64 = 60 * 5;
 
 #[cfg(feature = "use-webcam")]
 fn impl_produce_image() -> Image {
-    unimplemented!("TODO this one")
+    use tracing::debug;
+
+    use std::process::Command;
+    let output = Command::new("ffmpeg")
+        .args([
+            "-f",
+            "v4l2",
+            "-video_size",
+            "1280x720",
+            "-i",
+            "/dev/video0",
+            "-frames",
+            "1",
+            "-y",
+            "img.jpg",
+        ])
+        .output()
+        .expect("Couldn't run ffmpeg properly");
+
+    debug!(?output, "ffmpeg capture image");
+
+    let image_bytes = std::fs::read("img.jpg").expect("should be able to read image");
+    Image::new(&image_bytes)
 }
 
 #[cfg(not(feature = "use-webcam"))]
@@ -41,12 +60,12 @@ impl Postman {
     }
 
     fn send(&self, image: &Image) -> reqwest::Result<reqwest::blocking::Response> {
-        let endpoint = HERBS_NEW_IMAGE_POST_ENDPOINT;
+        let endpoint = shared::herbs::HERBS_NEW_IMAGE_POST_ENDPOINT;
         let endpoint = format!("http://localhost:8000{endpoint}");
 
         self.client
             .post(endpoint)
-            .bearer_auth(herbs_new_image_auth())
+            .bearer_auth(shared::herbs::herbs_new_image_auth())
             .json(image)
             .send()
     }

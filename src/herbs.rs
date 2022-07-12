@@ -1,28 +1,15 @@
-use std::{env, io::Cursor, path::PathBuf};
+use std::{io::Cursor, path::PathBuf};
 
 use axum::{response::IntoResponse, routing::post, Json, Router};
 use image::GenericImageView;
 use reqwest::StatusCode;
 use thiserror::Error;
 use tower_http::{auth, limit};
-use tracing::{debug, warn, info};
+use tracing::{debug, info};
 
-use crate::image::Image;
+use shared::image::Image;
 
 pub mod basil;
-
-// TODO: Would be nice to create this from parts.
-/// Endpoint where [`Image`]s can be POSTed.
-pub const HERBS_NEW_IMAGE_POST_ENDPOINT: &'static str = "/herbs-new-image";
-
-/// The bearer token needed to post an image.
-/// Stored in the env var `HERBS_NEW_IMAGE_PW`, or a fallback default if that is not set.
-pub fn herbs_new_image_auth() -> String {
-    env::var("HERBS_NEW_IMAGE_PW").unwrap_or_else(|_| {
-        warn!("Default herbs new image bearer token used!");
-        "basilisk".to_string()
-    })
-}
 
 #[derive(Debug, Error)]
 pub enum ImageError {
@@ -56,7 +43,7 @@ async fn handle_new_image(Json(image): Json<Image>) -> Result<(), ImageError> {
     }
 
     let output_path = PathBuf::from(format!(
-        "{}/static/herbs/webcam/{file_name}.jpg",
+        "{}/upload/herbs/webcam/{file_name}.jpg",
         std::env!("CARGO_MANIFEST_DIR")
     ));
     debug!("Storing image: `{output_path:?}`");
@@ -78,11 +65,11 @@ async fn handle_new_image(Json(image): Json<Image>) -> Result<(), ImageError> {
 
 pub fn new_image_endpoint() -> (&'static str, Router) {
     (
-        HERBS_NEW_IMAGE_POST_ENDPOINT,
+        shared::herbs::HERBS_NEW_IMAGE_POST_ENDPOINT,
         Router::new()
             .route("/", post(handle_new_image))
             .layer(auth::RequireAuthorizationLayer::bearer(
-                &herbs_new_image_auth(),
+                &shared::herbs::herbs_new_image_auth(),
             ))
             .layer(
                 // Max 500 KB images
