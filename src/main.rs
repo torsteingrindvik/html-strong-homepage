@@ -17,13 +17,14 @@ use html_strong_homepage::{
     page::{self, Rhs},
     training, Base, ContentUrl,
 };
+use tracing::info;
 
 #[cfg(feature = "tls")]
 async fn serve_tls(app: Router) {
     use axum_server::tls_rustls::RustlsConfig;
 
     let addr = SocketAddr::from(([0, 0, 0, 0], 443));
-    println!("listening on {}", addr);
+    info!("listening on {}", addr);
 
     let config = RustlsConfig::from_pem_file(
         "/etc/letsencrypt/live/torste.in/fullchain.pem",
@@ -61,7 +62,7 @@ async fn serve_acme() {
 
 async fn serve(app: Router) {
     let addr = SocketAddr::from(([0, 0, 0, 0], 8000));
-    println!("listening on {}", addr);
+    info!("listening on {}", addr);
 
     axum::Server::bind(&addr)
         .serve(app.into_make_service())
@@ -263,12 +264,15 @@ pub async fn main() {
         )
         .build();
 
+    let (herbs_new_image, herbs_new_image_router) = herbs::new_image_endpoint();
+
     let app = Router::new()
         .route(&content_home.url(), get(home::home))
         .nest(blog.url(), blog.router())
         .nest(blender.url(), blender.router())
         .nest(training.url(), training.router())
         .nest(herbs.url(), herbs.router())
+        .nest(herbs_new_image, herbs_new_image_router)
         .route(
             "/favicon.ico",
             get_service(ServeFile::new("static/favicon.ico")).handle_error(internal_server_error),

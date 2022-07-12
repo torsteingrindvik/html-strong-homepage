@@ -170,9 +170,7 @@ async fn render_page(node: Node) -> Result<Html<String>, (StatusCode, String)> {
             // For highlight.js
             "/static/css/shared/monokai.min.css",
         ]),
-        Some(vec![
-            "/static/js/highlight.min.js",
-        ]),
+        Some(vec!["/static/js/highlight.min.js"]),
         Some(vec!["hljs.highlightAll();"]),
         node,
     );

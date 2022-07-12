@@ -11,6 +11,7 @@ pub mod page;
 pub mod training;
 
 pub mod listing;
+pub mod image;
 
 #[derive(Debug)]
 pub enum Base {
