@@ -1,6 +1,6 @@
 use std::fmt::Debug;
 
-use chrono::{DateTime, Utc};
+use chrono::{DateTime, Utc, Local};
 use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Serialize, Deserialize)]
@@ -11,7 +11,8 @@ pub struct Image {
 
 impl Image {
     pub fn filename(&self) -> String {
-        self.timestamp.format("%F_%H-%M-%S").to_string()
+        let local: DateTime<Local> = DateTime::from(self.timestamp);
+        local.format("%F_%H-%M-%S").to_string()
     }
 }
 
