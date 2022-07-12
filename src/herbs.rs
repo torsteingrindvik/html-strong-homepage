@@ -31,7 +31,7 @@ impl IntoResponse for ImageError {
 
 async fn handle_new_image(Json(image): Json<Image>) -> Result<(), ImageError> {
     debug!(?image, "New image");
-    let file_name = image.filename();
+    let file_name = shared::image::human_time(&image.timestamp);
 
     let image = image::io::Reader::new(Cursor::new(image.buffer))
         .with_guessed_format()?

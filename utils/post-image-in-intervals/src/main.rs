@@ -9,12 +9,20 @@ const SECONDS_INTERVAL: u64 = 60 * 5;
 #[cfg(feature = "use-webcam")]
 fn impl_produce_image() -> Image {
     use tracing::debug;
-
     use std::process::Command;
+    use chrono::Utc;
+
+    let now = Utc::now();
+    let human_time = shared::image::human_time(&now);
+
+    let drawtext = format!("drawtext=text='{human_time}':fontcolor=white:fontsize=24:box=1:boxcolor=black:boxborderw=5:x=0:y=0");
+
     let output = Command::new("ffmpeg")
         .args([
             "-f",
             "v4l2",
+            "-f",
+            &drawtext,
             "-video_size",
             "1280x720",
             "-i",
@@ -30,7 +38,7 @@ fn impl_produce_image() -> Image {
     debug!(?output, "ffmpeg capture image");
 
     let image_bytes = std::fs::read("img.jpg").expect("should be able to read image");
-    Image::new(&image_bytes)
+    Image::new_with_timestamp(&image_bytes, now)
 }
 
 #[cfg(not(feature = "use-webcam"))]

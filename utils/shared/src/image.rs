@@ -9,11 +9,10 @@ pub struct Image {
     pub timestamp: DateTime<Utc>,
 }
 
-impl Image {
-    pub fn filename(&self) -> String {
-        let local: DateTime<Local> = DateTime::from(self.timestamp);
-        local.format("%F_%H-%M-%S").to_string()
-    }
+
+pub fn human_time(timestamp: &DateTime<Utc>) -> String {
+    let local: DateTime<Local> = DateTime::from(*timestamp);
+    local.format("%F_%H-%M-%S").to_string()
 }
 
 impl Debug for Image {
@@ -30,6 +29,13 @@ impl Image {
         Self {
             buffer: buffer.to_owned(),
             timestamp: Utc::now(),
+        }
+    }
+
+    pub fn new_with_timestamp(buffer: &[u8], timestamp: DateTime<Utc>) -> Self {
+        Self {
+            buffer: buffer.to_owned(),
+            timestamp,
         }
     }
 }
