@@ -15,18 +15,18 @@ fn impl_produce_image() -> Image {
     let now = Utc::now();
     let human_time = shared::image::human_time(&now);
 
-    let drawtext = format!("drawtext=text='{human_time}':fontcolor=white:fontsize=24:box=1:boxcolor=black:boxborderw=5:x=0:y=0");
+    let drawtext = format!("drawtext=text='{human_time}':fontcolor=white:fontsize=24:box=1:boxcolor=black:boxborderw=5:x=0:y=5");
 
     let output = Command::new("ffmpeg")
         .args([
             "-f",
             "v4l2",
-            "-f",
-            &drawtext,
-            "-video_size",
-            "1280x720",
             "-i",
             "/dev/video0",
+            "-video_size",
+            "1280x720",
+            "-vf",
+            &drawtext,
             "-frames",
             "1",
             "-y",
