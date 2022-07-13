@@ -41,6 +41,22 @@ pub fn intro() -> Article {
             "async-span-instrument",
             Source::new("code/tracing-explore/src/bin/async-span-instrument.rs"),
         ),
+        (
+            "async-span-instrument-proc-macro",
+            Source::new("code/tracing-explore/src/bin/async-span-instrument-proc-macro.rs"),
+        ),
+        (
+            "async-span-instrument-proc-macro-expanded",
+            Source::new("code/tracing-explore/async-span-instrument-proc-macro-expanded.rs"),
+        ),
+        (
+            "debugscriber",
+            Source::new("code/tracing-explore/src/bin/debugscriber.rs"),
+        ),
+        (
+            "debugscriber2",
+            Source::new("code/tracing-explore/src/bin/debugscriber2.rs"),
+        ),
     ]
     .into_iter()
     .collect();
@@ -506,4 +522,95 @@ pub fn intro() -> Article {
         .p(" the compiler can't know how big the returned type is, and then we can't create a properly sized stack for this function either.")
         .h3("Async: Solution candidate #2")
         .p("The other candidate is to use a proc macro:")
+        .code(code["async-span-instrument-proc-macro"].listing("Instrument proc macro"))
+        .p("Since we are back to using proc macros we can use the nice feature in rust-analyer to expand it for us.")
+        .p("The result is thus:")
+        .code(code["async-span-instrument-proc-macro-expanded"].listing("Instrument proc macro"))
+        .p("We didn't have to but we passed ")
+        .shell("foodie")
+        .p(" to the proc macro to see the effect. It's unsurprisingly passed on to the span creation macro. The docs list a number of similar things we can do to affect the other arguments passed to the span being created.")
+        .br()
+        .p("This solution in effect is close to the same as the previous solution, since ")
+        .shell("instrument()")
+        .p(" is used. There is also an optimization done with ")
+        .shell(".is_disabled()")
+        .p(", which helps skip doing work when e.g. the level is more verbose than what is enabled.")
+        .br()
+        .p("What should you use, then? Whichever you want. I personally tend to prefer non-macro solution whenever I can, as they feel less magic to me.")
+        .h2("Subscribers")
+        .p("There is one thing left to look at in this blogpost- subscribers.")
+        .br()
+        .p("We have picked up some information about them along the way already:")
+        .list(vec![
+            "Tracing has a way to access the globally set default subscriber",
+            "A dispatch is a handle to a subscriber",
+            "They receive events from log macros",
+            "They get notified when spans are entered",
+            "They get notified when the entered-span-guard is dropped",
+        ])
+        .br()
+        .p("The remaining questions I want answers to:")
+        .list(vec![
+            "There is only one active subscriber at a time (I think!). So how do we e.g. log to a combination of file, stdout, stderr, and others with one subscriber?",
+            "What other responsibilities does the subscriber have?",
+            "How does a simple subscriber implementation look like?"
+        ])
+        .h3("A simple subscriber")
+        .p("I think we'll start by just making a struct and letting rust-analyzer add a skeleton implementation for us for the ")
+        .url("https://docs.rs/tracing/0.1.35/tracing/trait.Subscriber.html", "Subscriber")
+        .p(" trait.")
+        .br()
+        .p("Rust-analyzer helps us out by making a skeleton impl:")
+        .code(code["debugscriber"].listing("Skeleton impl"))
+        .p("We will fill these in soon. Using this is done like so:")
+        .code(code["debugscriber"].listing("Skeleton impl use"))
+        .p("But since we have ")
+        .shell("todo!()")
+        .p("s everywhere it will crash. Can we predict in which function?")
+        .p("We expect" )
+        .shell("event")
+        .p(" to be called at one point. But thinking back to the log macro expansion, there are checks in place to see if the event should be dispatched at all or no, based on the metadata.")
+        .p("So we expect ")
+        .shell("enabled")
+        .p(" to panic the program.")
+        .br()
+        .p("Running this leads to:")
+        // TODO QUOTE
+        .br()
+        .p("thread 'main' panicked at 'not yet implemented', src/bin/debugscriber.rs:8:9")
+        .p("note: run with RUST_BACKTRACE=1 environment variable to display a backtrace")
+        .br()
+        .p("Checking that line it panicked where we predicted. Let's enable the backtrace to see if we can learn anything by it.")
+        .br()
+        .p("Instead of dumping the backtrace, here's a summary, which solidifies our earlier investigation into the log macros.")
+        .list(vec![
+            "Before passing the event to the default subscriber, the tracing machinery asks if anyone is interested",
+            "Interest is normally cached, but this is the first time this event has been issued, so..",
+            "..register this callsite for the first time..",
+            "..by asking the default subscriber (ours!) if this callsite should be enabled..",
+            "..which leads to the panic."
+        ])
+        .br()
+        .p("Now, let's try making a simple subscriber.")
+        .code(code["debugscriber2"].listing("Impl which just prints things"))
+        .p("We'll talk about all the functions. First, let's run it via this:")
+        .code(code["debugscriber2"].listing("Printing subscriber use"))
+        .p("Running that gives us:")
+        // TODO: Shell multiline
+        .code(code["debugscriber2"].listing("DbgScriber output"))
+        .p("A few things to notice here.")
+        .list(vec![
+            "Checking if a callsite is enabled is cached, as it does not happen the second loop iteration",
+            "new_span happens when a span is created, even though we don't ever enter (and exit) it",
+        ])
+        .br()
+        .p("Now we can look at the functions we had to implement. Let's do the easy ones first.")
+        .code(code["debugscriber2"].listing("Simplest subscriber fns"))
+        .p("We enable all callsites (whether span or event) unconditionally. When a span is entered or exited, we print it.")
+        .br()
+        .p("Follows from is new. The ")
+        .url("https://docs.rs/tracing/0.1.35/tracing/span/struct.Span.html#method.follows_from", "docs")
+        .p(" show that you can indicate that a span has this type of relationship to another span. It might be appropriate to use instead of parent-child in some cases.")
+        .p("This type of span can be open and running even though the thing that it followed closed. For example a thing which spawns tasks which may live longer than itself.")
+        .code(code["debugscriber2"].listing("Event and new_span"))
 }

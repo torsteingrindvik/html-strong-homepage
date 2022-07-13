@@ -1,6 +1,7 @@
 use std::sync::atomic::AtomicU64;
 
-use tracing::{info, info_span, span, Subscriber};
+use tracing::span::Attributes;
+use tracing::{info, info_span, span, Metadata, Subscriber};
 
 struct MySubscriber {
     // This was not allowed, we need Sync
@@ -20,7 +21,7 @@ impl MySubscriber {
 }
 
 impl Subscriber for MySubscriber {
-    fn enabled(&self, metadata: &tracing::Metadata<'_>) -> bool {
+    fn enabled(&self, metadata: &Metadata<'_>) -> bool {
         // So here I think I have to look at metadata, and figure out
         // if a span/event with that metadata would be recorded.
 
@@ -29,7 +30,7 @@ impl Subscriber for MySubscriber {
         // false
     }
 
-    fn new_span(&self, span: &span::Attributes<'_>) -> span::Id {
+    fn new_span(&self, span: &Attributes<'_>) -> span::Id {
         // Someone is creating a span.. we have to provide an id for it.
         // Hmm but we can't mutate self.. hmm, so we wrapped our inner thing in refcell and see what happens.
         //
