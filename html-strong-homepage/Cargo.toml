@@ -1,0 +1,29 @@
+[package]
+name = "html-strong-homepage"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+html-strong = { path = "../../html-strong" }
+shared = { path = "../shared" }
+
+axum = "0.5"
+axum-extra = { version = "0.2", features = ["cookie"] }
+
+tracing = "0.1.32"
+tracing-subscriber = "0.3.10"
+tokio = { version = "1", features = ["full"] }
+tower = { version = "0.4", features = ["full"] }
+tower-http = { version = "0.3", features = ["fs", "trace", "compression-full", "auth", "limit"] }
+reqwest = { version = "0.11", features = ["json"] }
+html-escape = "0.2.11"
+
+axum-server = { version = "0.3", features = ["tls-rustls"], optional = true }
+cached = "0.34.1"
+serde = { version = "1.0.138", features = ["derive"] }
+chrono = { version = "0.4.19", features = ["serde"] }
+image = "0.24.2"
+thiserror = "1.0.31"
+
+[features]
+tls = ["axum-server"]
