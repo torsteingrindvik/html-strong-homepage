@@ -5,4 +5,5 @@ members = [
     "img-to-webp",
     "shared",
     "post-image-in-intervals",
+    "timelapsifier"
 ]

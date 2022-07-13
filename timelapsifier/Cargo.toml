@@ -1,0 +1,10 @@
+[package]
+name = "timelapsifier"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+tokio = { version = "1.20.0", features = ["full"] }
+chrono = { version = "0.4.19" }
+tracing = "0.1.35"
+regex = "1.6.0"
