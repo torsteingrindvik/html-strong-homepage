@@ -62,7 +62,13 @@ async fn serve_acme() {
 }
 
 async fn serve(app: Router) {
+    // If TLS, need to redirect from 80 -> 443.
+    #[cfg(feature = "tls")]
+    let addr = SocketAddr::from(([0, 0, 0, 0], 80));
+
+    #[cfg(not(feature = "tls"))]
     let addr = SocketAddr::from(([0, 0, 0, 0], 8000));
+
     info!("listening on {}", addr);
 
     axum::Server::bind(&addr)
