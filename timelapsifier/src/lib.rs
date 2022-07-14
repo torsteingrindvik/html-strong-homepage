@@ -1,6 +1,7 @@
 use std::{
     collections::BTreeMap,
     path::{Path, PathBuf},
+    process::Output,
 };
 
 use chrono::{DateTime, Local, TimeZone, Timelike};
@@ -13,9 +14,15 @@ pub struct StoredImage {
     pub timestamp: DateTime<Local>,
 }
 
+impl AsRef<Path> for StoredImage {
+    fn as_ref(&self) -> &Path {
+        &self.file
+    }
+}
+
 static RE: OnceCell<Regex> = OnceCell::const_new();
 
-pub async fn ffmpeg_make_clip(images: &[StoredImage], output: &str) {
+pub async fn ffmpeg_make_clip(images: &[StoredImage], output: &str) -> Output {
     let file_name = "images-input.txt";
 
     let mut f = fs::OpenOptions::new()
@@ -38,15 +45,13 @@ pub async fn ffmpeg_make_clip(images: &[StoredImage], output: &str) {
         f.write(to_write.as_bytes()).await.expect("write ok");
     }
 
-    let output = Command::new("ffmpeg")
+    Command::new("ffmpeg")
         .args([
             "-y", "-safe", "0", "-f", "concat", "-r", "60", "-i", file_name, "-b:v", "1M", output,
         ])
         .output()
         .await
-        .expect("Couldn't run ffmpeg properly");
-
-    dbg!(output);
+        .expect("Couldn't run ffmpeg properly")
 }
 
 /// Sort images such that earlier timestamped images
@@ -192,16 +197,63 @@ pub async fn candidates<P: AsRef<Path>>(folder: P) -> Vec<StoredImage> {
     candidates
 }
 
+pub async fn move_all<P: AsRef<Path>>(images: &[P], output_folder: &str) {
+    for image in images {
+        println!("Moving {:?} to {output_folder:?}", image.as_ref());
+
+        let out = format!(
+            "{output_folder}/{}",
+            image
+                .as_ref()
+                .file_name()
+                .expect("should be able to get file name")
+                .to_str()
+                .expect("&str ok")
+        );
+
+        fs::rename(&image, out)
+            .await
+            .expect("should be able to move to processed folder");
+    }
+}
+
 #[cfg(test)]
 mod tests {
-    use chrono::Datelike;
-
     use super::*;
 
+    async fn files_in<P: AsRef<Path>>(folder: P) -> Vec<PathBuf> {
+        let mut dir_stream = fs::read_dir(folder)
+            .await
+            .expect("should be able to read given folder");
+
+        let mut files = vec![];
+
+        while let Ok(Some(entry)) = dir_stream.next_entry().await {
+            let file_metadata = entry
+                .metadata()
+                .await
+                .expect("should be able to get file metadata");
+
+            if !file_metadata.is_file() {
+                continue;
+            }
+
+            files.push(entry.path());
+        }
+
+        files
+    }
+
     #[tokio::test]
-    async fn test_add() {
-        let mut candidates =
-            candidates(format!("{}/test_images", env!("CARGO_MANIFEST_DIR"))).await;
+    async fn test_make_timelapses() {
+        let images_unprocessed_path = format!("{}/test_images", env!("CARGO_MANIFEST_DIR"));
+        let images_processed_path = format!("{}/test_images_processed", env!("CARGO_MANIFEST_DIR"));
+
+        // For test purposes move any images back
+        let images_processed = files_in(&images_processed_path).await;
+        move_all(&images_processed, &images_unprocessed_path).await;
+
+        let mut candidates = candidates(images_unprocessed_path).await;
 
         sort_images(&mut candidates);
 
@@ -238,7 +290,12 @@ mod tests {
         assert_eq!(groups.keys().len(), 2);
 
         for (dt, images) in groups {
-            ffmpeg_make_clip(&images, &format!("day-{}.webm", dt.day())).await;
+            let output =
+                ffmpeg_make_clip(&images, &format!("output_webm/days/{}.webm", dt.format("%Y-%m-%d"))).await;
+
+            println!("{output:?}");
+            assert!(output.status.success());
+            move_all(&images, &images_processed_path).await;
         }
     }
 }
