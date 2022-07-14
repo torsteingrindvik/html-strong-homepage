@@ -2,11 +2,18 @@ use std::{
     collections::BTreeMap,
     path::{Path, PathBuf},
     process::Output,
+    sync::Arc,
 };
 
 use chrono::{DateTime, Local, TimeZone, Timelike};
 use regex::Regex;
-use tokio::{fs, io::AsyncWriteExt, process::Command, sync::OnceCell};
+use tokio::{
+    fs,
+    io::AsyncWriteExt,
+    process::Command,
+    sync::{OnceCell, RwLock},
+};
+use tracing::{error, info};
 
 #[derive(Debug, Clone)]
 pub struct StoredImage {
@@ -20,9 +27,111 @@ impl AsRef<Path> for StoredImage {
     }
 }
 
+fn duration_until_tomorrow_night_01() -> std::time::Duration {
+    let now = Local::now();
+
+    // Add one day, then floor towards 01:00 in the night.
+    let tomorrow_night_01 = (now + chrono::Duration::days(1))
+        .with_hour(1)
+        .expect("hour ok")
+        .with_minute(0)
+        .expect("minute ok")
+        .with_second(0)
+        .expect("seconds ok");
+
+    tomorrow_night_01
+        .signed_duration_since(now)
+        .to_std()
+        .expect("Duration std ok")
+}
+
+pub struct TimelapserOptions {
+    pub unprocessed_images_folder: PathBuf,
+    pub processed_images_folder: PathBuf,
+    pub timelapse_output_folder: PathBuf,
+
+    pub timelapse_webms: Arc<RwLock<Vec<PathBuf>>>,
+}
+
+async fn do_work(options: &TimelapserOptions) {
+    info!("Looking for timelapse image candidates");
+
+    let candidates = candidates(&options.unprocessed_images_folder).await;
+    if candidates.is_empty() {
+        info!("No candidates");
+        return;
+    }
+
+    info!("Found candidates: {candidates:?}");
+
+    let before_today = images_before_day_of(candidates.clone(), Local::now());
+    if before_today.is_empty() {
+        info!("No images from earlier days");
+        return;
+    }
+
+    let grouped_by_days = group_by_day(before_today);
+
+    for (day, images_that_day) in grouped_by_days {
+        info!("Making a timelapse for day {day:?}");
+
+        let mut output_webm = options.timelapse_output_folder.clone();
+        output_webm.push("days");
+        if !output_webm.exists() {
+            info!("Making output dir {output_webm:?}");
+            fs::create_dir_all(&output_webm)
+                .await
+                .expect("make dirs ok");
+        }
+
+        output_webm.push(format!("{}.webm", day.format("%Y-%m-%d")));
+
+        let output = ffmpeg_make_clip(
+            &images_that_day,
+            output_webm.to_str().expect("ok &str webm path"),
+        )
+        .await;
+
+        if !output.status.success() {
+            error!(?output, "Timelapse creation not successful!");
+            return;
+        } else {
+            info!("Timelapse made ok: {output_webm:?}")
+        }
+
+        move_all(&images_that_day, &options.processed_images_folder).await;
+        info!(
+            "Images processed ({}) moved to processed folder.",
+            images_that_day.len()
+        );
+
+        let webms = files_of_ext_in(&options.timelapse_output_folder, &["webm"]).await;
+        info!("# webms: {}", webms.len());
+        *options.timelapse_webms.write().await = webms;
+
+        // TODO: Delete processed images >1 week old?
+    }
+}
+
+/// Create a worker
+pub fn spawn_worker(options: TimelapserOptions) {
+    use tokio::time;
+
+    tokio::spawn(async move {
+        info!("Timelapsifying forever");
+
+        loop {
+            do_work(&options).await;
+
+            let sleep_duration = duration_until_tomorrow_night_01();
+            time::sleep(sleep_duration).await;
+        }
+    });
+}
+
 static RE: OnceCell<Regex> = OnceCell::const_new();
 
-pub async fn ffmpeg_make_clip(images: &[StoredImage], output: &str) -> Output {
+pub async fn ffmpeg_make_clip(images: &[StoredImage], output_webm: &str) -> Output {
     let file_name = "images-input.txt";
 
     let mut f = fs::OpenOptions::new()
@@ -47,7 +156,18 @@ pub async fn ffmpeg_make_clip(images: &[StoredImage], output: &str) -> Output {
 
     Command::new("ffmpeg")
         .args([
-            "-y", "-safe", "0", "-f", "concat", "-r", "60", "-i", file_name, "-b:v", "1M", output,
+            "-y",
+            "-safe",
+            "0",
+            "-f",
+            "concat",
+            "-r",
+            "60",
+            "-i",
+            file_name,
+            "-b:v",
+            "1M",
+            output_webm,
         ])
         .output()
         .await
@@ -197,12 +317,18 @@ pub async fn candidates<P: AsRef<Path>>(folder: P) -> Vec<StoredImage> {
     candidates
 }
 
-pub async fn move_all<P: AsRef<Path>>(images: &[P], output_folder: &str) {
+pub async fn move_all<P1: AsRef<Path>, P2: AsRef<Path>>(images: &[P1], output_folder: P2) {
     for image in images {
-        println!("Moving {:?} to {output_folder:?}", image.as_ref());
+        println!(
+            "Moving {:?} to {:?}",
+            image.as_ref(),
+            output_folder.as_ref()
+        );
+
+        let out_folder = output_folder.as_ref().to_str().expect("out folder ok");
 
         let out = format!(
-            "{output_folder}/{}",
+            "{out_folder}/{}",
             image
                 .as_ref()
                 .file_name()
@@ -217,31 +343,51 @@ pub async fn move_all<P: AsRef<Path>>(images: &[P], output_folder: &str) {
     }
 }
 
+async fn files_of_ext_in<P: AsRef<Path>>(folder: P, exts: &[&'static str]) -> Vec<PathBuf> {
+    let mut dir_stream = fs::read_dir(folder)
+        .await
+        .expect("should be able to read given folder");
+
+    let mut files = vec![];
+
+    while let Ok(Some(entry)) = dir_stream.next_entry().await {
+        let file_metadata = entry
+            .metadata()
+            .await
+            .expect("should be able to get file metadata");
+
+        if !file_metadata.is_file() {
+            continue;
+        }
+
+        let path = entry.path();
+        let ext = match path.extension() {
+            Some(e) => e,
+            None => continue,
+        };
+
+        let ext = ext.to_str().expect("&str ok").to_ascii_lowercase();
+
+        if !exts.iter().any(|&e| e == ext.as_str()) {
+            continue;
+        }
+
+        files.push(entry.path());
+    }
+
+    files
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
 
-    async fn files_in<P: AsRef<Path>>(folder: P) -> Vec<PathBuf> {
-        let mut dir_stream = fs::read_dir(folder)
-            .await
-            .expect("should be able to read given folder");
+    #[test]
+    fn test_time_until_tomorrow() {
+        let secs = duration_until_tomorrow_night_01().as_secs_f32();
 
-        let mut files = vec![];
-
-        while let Ok(Some(entry)) = dir_stream.next_entry().await {
-            let file_metadata = entry
-                .metadata()
-                .await
-                .expect("should be able to get file metadata");
-
-            if !file_metadata.is_file() {
-                continue;
-            }
-
-            files.push(entry.path());
-        }
-
-        files
+        let hrs = secs / 60.0 / 60.0;
+        dbg!(hrs);
     }
 
     #[tokio::test]
@@ -250,7 +396,7 @@ mod tests {
         let images_processed_path = format!("{}/test_images_processed", env!("CARGO_MANIFEST_DIR"));
 
         // For test purposes move any images back
-        let images_processed = files_in(&images_processed_path).await;
+        let images_processed = files_of_ext_in(&images_processed_path, &["jpg"]).await;
         move_all(&images_processed, &images_unprocessed_path).await;
 
         let mut candidates = candidates(images_unprocessed_path).await;
@@ -290,8 +436,11 @@ mod tests {
         assert_eq!(groups.keys().len(), 2);
 
         for (dt, images) in groups {
-            let output =
-                ffmpeg_make_clip(&images, &format!("output_webm/days/{}.webm", dt.format("%Y-%m-%d"))).await;
+            let output = ffmpeg_make_clip(
+                &images,
+                &format!("output_webm/days/{}.webm", dt.format("%Y-%m-%d")),
+            )
+            .await;
 
             println!("{output:?}");
             assert!(output.status.success());
