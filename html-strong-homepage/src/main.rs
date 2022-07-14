@@ -1,8 +1,9 @@
 use axum::{
     routing::{get, get_service},
-    Router,
+    Extension, Router,
 };
-use std::net::SocketAddr;
+use std::{net::SocketAddr, path::PathBuf, sync::Arc};
+use tokio::sync::RwLock;
 use tower::{limit::ConcurrencyLimitLayer, ServiceBuilder};
 use tower_http::{
     compression::CompressionLayer,
@@ -262,9 +263,44 @@ pub async fn main() {
             Rhs::one_image("whole-family.webp"),
             herbs::basil::seeds(),
         )
+        // .post(
+        //     "timelapse",
+        //     "Timelapse",
+        //     "2022-07-14",
+        //     "Auto-updating timelapses every night!",
+        //     // TODO: Would it be cool to have a mini-timelapse here?
+        //     // (Of course it would but will we bother making that)
+        //     Rhs::Nothing,
+        //     herbs::basil::timelapse(),
+        // )
         .build();
 
-    let (herbs_new_image, herbs_new_image_router) = herbs::new_image_endpoint();
+    let timelapse_output_folder = PathBuf::from(format!(
+        "{}/{}",
+        env!("CARGO_MANIFEST_DIR"),
+        shared::herbs::timelapse_output_relative_folder()
+    ));
+    let timelapse_webms = timelapsifier::files_of_ext_in(&timelapse_output_folder, &["webm"]).await;
+
+    let timelapse_options = timelapsifier::TimelapserOptions {
+        unprocessed_images_folder: PathBuf::from(format!(
+            "{}/{}",
+            env!("CARGO_MANIFEST_DIR"),
+            shared::herbs::new_image_output_relative_folder()
+        )),
+        processed_images_folder: PathBuf::from(format!(
+            "{}/{}",
+            env!("CARGO_MANIFEST_DIR"),
+            shared::herbs::processed_image_output_relative_folder()
+        )),
+        timelapse_output_folder,
+        timelapse_webms: Arc::new(RwLock::new(timelapse_webms)),
+    };
+    // Whenever a new webm is created, its path is updated in this state.
+    // Share this state with the herbs post which displays these.
+    let webms = timelapse_options.timelapse_webms.clone();
+
+    let (herbs_new_image, herbs_new_image_router) = herbs::timelapsify_init(timelapse_options);
 
     let app = Router::new()
         .route(&content_home.url(), get(home::home))
@@ -272,7 +308,14 @@ pub async fn main() {
         .nest(blender.url(), blender.router())
         .nest(training.url(), training.router())
         .nest(herbs.url(), herbs.router())
+        // TODO: Merge these into one thing
         .nest(herbs_new_image, herbs_new_image_router)
+        .nest(
+            "/timelapse",
+            Router::new()
+                .route("/", get(herbs::basil::timelapse))
+                .layer(Extension(webms)),
+        )
         .route(
             "/favicon.ico",
             get_service(ServeFile::new("static/favicon.ico")).handle_error(internal_server_error),

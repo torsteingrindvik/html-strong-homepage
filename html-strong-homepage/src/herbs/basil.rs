@@ -1,4 +1,9 @@
-use crate::components::Article;
+use axum::{response::Html, Extension};
+use html_strong::{science_lab::NodeExt, tags::Div};
+use pathdiff::diff_paths;
+use reqwest::StatusCode;
+
+use crate::{base::html_doc, common::render, components::Article};
 
 pub fn hello_world() -> Article {
     Article::new()
@@ -186,4 +191,28 @@ pub fn seeds() -> Article {
         .h3("The whole family")
         .p("So since we could not get another heating pad, let's cramp the whole lot together:")
         .image("whole-family.webp")
+}
+
+pub async fn timelapse(
+    Extension(webms): Extension<timelapsifier::StateWebms>,
+) -> Result<Html<String>, (StatusCode, String)> {
+    let mut article = Article::new()
+        .h2("Timelapse")
+        .p("I have set up a time lapse for the herb growing.")
+        .p("This page should auto-update every night.").br().p("Currently, one timelapse is one full day. Eventually I will merge day-timelapses into longer periods.");
+
+    let webms = webms.read().await;
+
+    for webm in webms.iter().rev() {
+        let rel = diff_paths(webm, env!("CARGO_MANIFEST_DIR")).expect("a relative path");
+        let rel_str = rel.to_str().expect("relative path ok");
+
+        let video_name = rel.file_stem().expect("file name ok");
+        article = article.h3(video_name.to_str().expect("file name ok"));
+        article = article.video(&format!("/{rel_str}"));
+    }
+
+    let html = html_doc::<&'static str>(None, None, None, article.into_node());
+
+    render(Div.class("post").kid(html))
 }

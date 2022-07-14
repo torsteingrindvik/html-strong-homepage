@@ -59,6 +59,7 @@ pub fn html_doc<S: AsRef<str>>(
         .kid(A::href(&ContentUrl::new(Base::Home).url()).text("Home 🏠"))
         .kid(A::href(&ContentUrl::new(Base::Blog).url()).text("Blog 📚"))
         .kid(A::href(&ContentUrl::new(Base::Herbs).url()).text("Herbs 🌱"))
+        .kid(A::href(&ContentUrl::new(Base::Timelapse).url()).text("Timelapse 🕒"))
         .kid(A::href(&ContentUrl::new(Base::Blender).url()).text("Blender ⛰️"))
         .kid(A::href(&ContentUrl::new(Base::Training).url()).text("Training 🏋️"));
 

@@ -1,6 +1,7 @@
 use std::str::Lines;
 
 use html_strong::{document_tree::Node, science_lab::NodeExt, tags::*};
+use tracing::debug;
 
 #[derive(Debug)]
 pub struct Source {
@@ -72,6 +73,7 @@ impl NodeExt for Listing {
 
 impl Source {
     pub fn new(source_path: &str) -> Self {
+        debug!("Source: {source_path}");
         Self {
             // Technically this should be async.
             // We use [`Source`] when making content via [`Article`], and that API

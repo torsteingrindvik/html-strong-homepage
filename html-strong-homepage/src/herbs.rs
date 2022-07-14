@@ -43,8 +43,9 @@ async fn handle_new_image(Json(image): Json<Image>) -> Result<(), ImageError> {
     }
 
     let output_path = PathBuf::from(format!(
-        "{}/upload/herbs/webcam/{file_name}.jpg",
-        std::env!("CARGO_MANIFEST_DIR")
+        "{}/{}/{file_name}.jpg",
+        std::env!("CARGO_MANIFEST_DIR"),
+        shared::herbs::new_image_output_relative_folder()
     ));
     debug!("Storing image: `{output_path:?}`");
 
@@ -63,13 +64,19 @@ async fn handle_new_image(Json(image): Json<Image>) -> Result<(), ImageError> {
     Ok(())
 }
 
-pub fn new_image_endpoint() -> (&'static str, Router) {
+/// Get POST url and router for uploading new images from
+/// Raspberry Pi.
+///
+/// Spawns worker which processes images into new timelapse WEBMs.
+pub fn timelapsify_init(options: timelapsifier::TimelapserOptions) -> (&'static str, Router) {
+    timelapsifier::spawn_worker(options);
+
     (
-        shared::herbs::HERBS_NEW_IMAGE_POST_ENDPOINT,
+        shared::herbs::IMAGE_POST_ENDPOINT,
         Router::new()
             .route("/", post(handle_new_image))
             .layer(auth::RequireAuthorizationLayer::bearer(
-                &shared::herbs::herbs_new_image_auth(),
+                &shared::herbs::new_image_auth(),
             ))
             .layer(
                 // Max 500 KB images

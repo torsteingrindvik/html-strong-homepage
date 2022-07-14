@@ -6,6 +6,7 @@ edition = "2021"
 [dependencies]
 html-strong = { path = "../../html-strong" }
 shared = { path = "../shared" }
+timelapsifier = { path = "../timelapsifier" }
 
 axum = "0.5"
 axum-extra = { version = "0.2", features = ["cookie"] }
@@ -24,6 +25,7 @@ serde = { version = "1.0.138", features = ["derive"] }
 chrono = { version = "0.4.19", features = ["serde"] }
 image = "0.24.2"
 thiserror = "1.0.31"
+pathdiff = "0.2.1"
 
 [features]
 tls = ["axum-server"]

@@ -38,6 +38,10 @@ fn home_impl() -> Result<Html<String>, (StatusCode, String)> {
         ))
         .kid(Entry::new("Herbs 🌱", "Let's grow these."))
         .kid(Entry::new(
+            "Timelapse 🕒",
+            "Auto-uploaded timelapse videos of herbs!",
+        ))
+        .kid(Entry::new(
             "Blender ⛰️",
             "If I ever git gud at Blender it would be fun to have some progress images.",
         ))

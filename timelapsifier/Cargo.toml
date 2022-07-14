@@ -8,3 +8,6 @@ tokio = { version = "1.20.0", features = ["full"] }
 chrono = { version = "0.4.19" }
 tracing = "0.1.35"
 regex = "1.6.0"
+
+[dev-dependencies]
+tracing-subscriber = "0.3.10"

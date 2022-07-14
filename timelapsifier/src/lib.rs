@@ -13,10 +13,10 @@ use tokio::{
     process::Command,
     sync::{OnceCell, RwLock},
 };
-use tracing::{error, info};
+use tracing::{debug, error, info, trace};
 
 #[derive(Debug, Clone)]
-pub struct StoredImage {
+struct StoredImage {
     pub file: PathBuf,
     pub timestamp: DateTime<Local>,
 }
@@ -45,24 +45,27 @@ fn duration_until_tomorrow_night_01() -> std::time::Duration {
         .expect("Duration std ok")
 }
 
+pub type StateWebms = Arc<RwLock<Vec<PathBuf>>>;
+
 pub struct TimelapserOptions {
     pub unprocessed_images_folder: PathBuf,
     pub processed_images_folder: PathBuf,
     pub timelapse_output_folder: PathBuf,
 
-    pub timelapse_webms: Arc<RwLock<Vec<PathBuf>>>,
+    pub timelapse_webms: StateWebms,
 }
 
 async fn do_work(options: &TimelapserOptions) {
     info!("Looking for timelapse image candidates");
 
-    let candidates = candidates(&options.unprocessed_images_folder).await;
+    let mut candidates = candidates(&options.unprocessed_images_folder).await;
     if candidates.is_empty() {
         info!("No candidates");
         return;
     }
+    sort_images(&mut candidates);
 
-    info!("Found candidates: {candidates:?}");
+    info!("Found {} candidates", candidates.len());
 
     let before_today = images_before_day_of(candidates.clone(), Local::now());
     if before_today.is_empty() {
@@ -76,7 +79,6 @@ async fn do_work(options: &TimelapserOptions) {
         info!("Making a timelapse for day {day:?}");
 
         let mut output_webm = options.timelapse_output_folder.clone();
-        output_webm.push("days");
         if !output_webm.exists() {
             info!("Making output dir {output_webm:?}");
             fs::create_dir_all(&output_webm)
@@ -97,6 +99,16 @@ async fn do_work(options: &TimelapserOptions) {
             return;
         } else {
             info!("Timelapse made ok: {output_webm:?}")
+        }
+
+        if !options.processed_images_folder.exists() {
+            info!(
+                "Making processed dir {:?}",
+                &options.processed_images_folder
+            );
+            fs::create_dir_all(&options.processed_images_folder)
+                .await
+                .expect("make dirs ok");
         }
 
         move_all(&images_that_day, &options.processed_images_folder).await;
@@ -124,6 +136,8 @@ pub fn spawn_worker(options: TimelapserOptions) {
             do_work(&options).await;
 
             let sleep_duration = duration_until_tomorrow_night_01();
+            debug!("Sleeping for {:?}", sleep_duration);
+
             time::sleep(sleep_duration).await;
         }
     });
@@ -131,7 +145,7 @@ pub fn spawn_worker(options: TimelapserOptions) {
 
 static RE: OnceCell<Regex> = OnceCell::const_new();
 
-pub async fn ffmpeg_make_clip(images: &[StoredImage], output_webm: &str) -> Output {
+async fn ffmpeg_make_clip(images: &[StoredImage], output_webm: &str) -> Output {
     let file_name = "images-input.txt";
 
     let mut f = fs::OpenOptions::new()
@@ -176,7 +190,7 @@ pub async fn ffmpeg_make_clip(images: &[StoredImage], output_webm: &str) -> Outp
 
 /// Sort images such that earlier timestamped images
 /// come first.
-pub fn sort_images(images: &mut [StoredImage]) {
+fn sort_images(images: &mut [StoredImage]) {
     images.sort_unstable_by_key(|image| image.timestamp);
 }
 
@@ -192,10 +206,7 @@ fn floor_to_day(timestamp: &DateTime<Local>) -> DateTime<Local> {
 }
 
 /// Takes a vector of sorted images, and returns all that came before the day of the given timestamp.
-pub fn images_before_day_of(
-    images: Vec<StoredImage>,
-    timestamp: DateTime<Local>,
-) -> Vec<StoredImage> {
+fn images_before_day_of(images: Vec<StoredImage>, timestamp: DateTime<Local>) -> Vec<StoredImage> {
     let timestamp = floor_to_day(&timestamp);
 
     images
@@ -205,7 +216,7 @@ pub fn images_before_day_of(
 }
 
 /// Group a vector of sorted images into groups by the day.
-pub fn group_by_day(images: Vec<StoredImage>) -> BTreeMap<DateTime<Local>, Vec<StoredImage>> {
+fn group_by_day(images: Vec<StoredImage>) -> BTreeMap<DateTime<Local>, Vec<StoredImage>> {
     let mut groups = BTreeMap::<DateTime<Local>, Vec<StoredImage>>::new();
 
     for image in images {
@@ -221,7 +232,8 @@ pub fn group_by_day(images: Vec<StoredImage>) -> BTreeMap<DateTime<Local>, Vec<S
 ///
 /// Async because this will run in a worker on the web server,
 /// and we don't want to be blocking threads.
-pub async fn candidates<P: AsRef<Path>>(folder: P) -> Vec<StoredImage> {
+async fn candidates<P: AsRef<Path>>(folder: P) -> Vec<StoredImage> {
+    debug!("Looking for candidates in folder {:?}", folder.as_ref());
     let mut dir_stream = fs::read_dir(folder)
         .await
         .expect("should be able to read given folder");
@@ -317,9 +329,9 @@ pub async fn candidates<P: AsRef<Path>>(folder: P) -> Vec<StoredImage> {
     candidates
 }
 
-pub async fn move_all<P1: AsRef<Path>, P2: AsRef<Path>>(images: &[P1], output_folder: P2) {
+async fn move_all<P1: AsRef<Path>, P2: AsRef<Path>>(images: &[P1], output_folder: P2) {
     for image in images {
-        println!(
+        trace!(
             "Moving {:?} to {:?}",
             image.as_ref(),
             output_folder.as_ref()
@@ -343,7 +355,9 @@ pub async fn move_all<P1: AsRef<Path>, P2: AsRef<Path>>(images: &[P1], output_fo
     }
 }
 
-async fn files_of_ext_in<P: AsRef<Path>>(folder: P, exts: &[&'static str]) -> Vec<PathBuf> {
+/// Count the number of files with any of the given extensions in the given folder.
+pub async fn files_of_ext_in<P: AsRef<Path>>(folder: P, exts: &[&'static str]) -> Vec<PathBuf> {
+    debug!("Looking for {:?} in {:?}", exts, folder.as_ref());
     let mut dir_stream = fs::read_dir(folder)
         .await
         .expect("should be able to read given folder");
@@ -367,6 +381,7 @@ async fn files_of_ext_in<P: AsRef<Path>>(folder: P, exts: &[&'static str]) -> Ve
         };
 
         let ext = ext.to_str().expect("&str ok").to_ascii_lowercase();
+        trace!("Comparing {ext} to {exts:?}");
 
         if !exts.iter().any(|&e| e == ext.as_str()) {
             continue;
@@ -375,11 +390,14 @@ async fn files_of_ext_in<P: AsRef<Path>>(folder: P, exts: &[&'static str]) -> Ve
         files.push(entry.path());
     }
 
+    debug!("Found {}", files.len());
     files
 }
 
 #[cfg(test)]
 mod tests {
+    use tracing::metadata::LevelFilter;
+
     use super::*;
 
     #[test]
@@ -392,6 +410,8 @@ mod tests {
 
     #[tokio::test]
     async fn test_make_timelapses() {
+        tracing_subscriber::fmt().with_max_level(LevelFilter::DEBUG).init();
+
         let images_unprocessed_path = format!("{}/test_images", env!("CARGO_MANIFEST_DIR"));
         let images_processed_path = format!("{}/test_images_processed", env!("CARGO_MANIFEST_DIR"));
 
@@ -446,5 +466,8 @@ mod tests {
             assert!(output.status.success());
             move_all(&images, &images_processed_path).await;
         }
+
+        let webms = files_of_ext_in("output_webm/days", &["webm"]).await;
+        assert_eq!(2, webms.len());
     }
 }

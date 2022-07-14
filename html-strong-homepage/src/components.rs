@@ -1,4 +1,5 @@
 use html_strong::{document_tree::Node, science_lab::NodeExt, tags::*};
+use tracing::error;
 
 use crate::listing::Listing;
 
@@ -32,12 +33,14 @@ impl Article {
     }
 
     fn absolute_path(&self, url: &str) -> String {
-        format!(
-            "{}/{url}",
-            self.url_prefix
-                .as_ref()
-                .expect("should set a url_prefix before resolving absolute path")
-        )
+        if let Some(absolute_prefix) = self.url_prefix.as_ref() {
+            format!("{absolute_prefix}/{url}",)
+        } else if !url.starts_with("/") {
+            error!(?url, "bad url");
+            panic!("Expected url to be absolute")
+        } else {
+            url.to_string()
+        }
     }
 
     fn add_tidbit(mut self, tidbit: Tidbit) -> Self {

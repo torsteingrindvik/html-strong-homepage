@@ -68,12 +68,12 @@ impl Postman {
     }
 
     fn send(&self, image: &Image) -> reqwest::Result<reqwest::blocking::Response> {
-        let endpoint = shared::herbs::HERBS_NEW_IMAGE_POST_ENDPOINT;
+        let endpoint = shared::herbs::IMAGE_POST_ENDPOINT;
         let endpoint = format!("http://localhost:8000{endpoint}");
 
         self.client
             .post(endpoint)
-            .bearer_auth(shared::herbs::herbs_new_image_auth())
+            .bearer_auth(shared::herbs::new_image_auth())
             .json(image)
             .send()
     }

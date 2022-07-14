@@ -18,6 +18,7 @@ pub enum Base {
     Home,
     Blog,
     Herbs,
+    Timelapse,
     Blender,
     Training,
 }
@@ -31,6 +32,7 @@ impl Display for Base {
             Base::Blog => "blog",
             Base::Herbs => "herbs",
             Base::Training => "training",
+            Base::Timelapse => "timelapse",
         };
 
         write!(f, "{s}")
