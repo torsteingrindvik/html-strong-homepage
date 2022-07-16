@@ -67,7 +67,7 @@ async fn handle_new_image(Json(image): Json<Image>) -> Result<(), ImageError> {
 /// Get POST url and router for uploading new images from
 /// Raspberry Pi.
 ///
-/// Spawns worker which processes images into new timelapse WEBMs.
+/// Spawns worker which processes images into new timelapse MP4s.
 pub fn timelapsify_init(options: timelapsifier::TimelapserOptions) -> (&'static str, Router) {
     timelapsifier::spawn_worker(options);
 

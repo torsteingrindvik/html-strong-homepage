@@ -2,6 +2,7 @@ use axum::{response::Html, Extension};
 use html_strong::{science_lab::NodeExt, tags::Div};
 use pathdiff::diff_paths;
 use reqwest::StatusCode;
+use timelapsifier::sort_files_by_timestamp;
 
 use crate::{base::html_doc, common::render, components::Article};
 
@@ -194,17 +195,18 @@ pub fn seeds() -> Article {
 }
 
 pub async fn timelapse(
-    Extension(webms): Extension<timelapsifier::StateWebms>,
+    Extension(videos): Extension<timelapsifier::StateVideos>,
 ) -> Result<Html<String>, (StatusCode, String)> {
     let mut article = Article::new()
         .h2("Timelapse")
         .p("I have set up a time lapse for the herb growing.")
         .p("This page should auto-update every night.").br().p("Currently, one timelapse is one full day. Eventually I will merge day-timelapses into longer periods.");
 
-    let webms = webms.read().await;
+    let mut videos = videos.read().await.clone();
+    sort_files_by_timestamp(&mut videos);
 
-    for webm in webms.iter().rev() {
-        let rel = diff_paths(webm, env!("CARGO_MANIFEST_DIR")).expect("a relative path");
+    for video in videos.iter().rev() {
+        let rel = diff_paths(video, env!("CARGO_MANIFEST_DIR")).expect("a relative path");
         let rel_str = rel.to_str().expect("relative path ok");
 
         let video_name = rel.file_stem().expect("file name ok");

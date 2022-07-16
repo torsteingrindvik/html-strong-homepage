@@ -72,7 +72,6 @@ impl Article {
 
     /// Adds a video with loop and controls.
     /// Is displayed in its own area.
-    /// Should be webm.
     pub fn video(self, path: &str) -> Self {
         self.add_tidbit(Tidbit::Video(path.to_string()))
     }
@@ -193,13 +192,21 @@ impl NodeExt for Article {
                             .class("rounded breather-y center width-100"),
                     );
                 }
-                Tidbit::Video(path) => output.add_standalone(
+                Tidbit::Video(path) => output.add_standalone({
+                    let source = if path.ends_with("webm") {
+                        Source::new_webm(self.absolute_path(path))
+                    } else if path.ends_with("mp4") {
+                        Source::new_mp4(self.absolute_path(path))
+                    } else {
+                        error!(?path, "unhandled video extension");
+                        panic!()
+                    };
+
                     Video::new()
                         .controls()
-                        .loop_()
-                        .kid(Source::new_webm(self.absolute_path(path)))
-                        .class("rounded breather-y width-100"),
-                ),
+                        .kid(source)
+                        .class("rounded breather-y width-100")
+                }),
                 Tidbit::Code(code) => {
                     output.add_standalone(code.clone());
                 }

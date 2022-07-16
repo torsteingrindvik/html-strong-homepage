@@ -286,7 +286,11 @@ pub async fn main() {
         env!("CARGO_MANIFEST_DIR"),
         shared::herbs::timelapse_output_relative_folder()
     ));
-    let timelapse_webms = timelapsifier::files_of_ext_in(&timelapse_output_folder, &["webm"]).await;
+    let timelapse_videos = timelapsifier::files_of_ext_in(&timelapse_output_folder, &["mp4"])
+        .await
+        .into_iter()
+        .filter_map(|video| video.try_into().ok())
+        .collect();
 
     let timelapse_options = timelapsifier::TimelapserOptions {
         unprocessed_images_folder: PathBuf::from(format!(
@@ -300,11 +304,11 @@ pub async fn main() {
             shared::herbs::processed_image_output_relative_folder()
         )),
         timelapse_output_folder,
-        timelapse_webms: Arc::new(RwLock::new(timelapse_webms)),
+        timelapse_videos: Arc::new(RwLock::new(timelapse_videos)),
     };
-    // Whenever a new webm is created, its path is updated in this state.
+    // Whenever a new video is created, its path is updated in this state.
     // Share this state with the herbs post which displays these.
-    let webms = timelapse_options.timelapse_webms.clone();
+    let videos = timelapse_options.timelapse_videos.clone();
 
     let (herbs_new_image, herbs_new_image_router) = herbs::timelapsify_init(timelapse_options);
 
@@ -320,7 +324,7 @@ pub async fn main() {
             "/timelapse",
             Router::new()
                 .route("/", get(herbs::basil::timelapse))
-                .layer(Extension(webms)),
+                .layer(Extension(videos)),
         )
         .route(
             "/favicon.ico",
