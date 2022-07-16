@@ -13,7 +13,7 @@ use thiserror::Error;
 use tokio::{fs, io::AsyncWriteExt, process::Command, sync::RwLock};
 use tracing::{debug, error, info, instrument, trace, warn};
 
-static RE: Lazy<Regex> = Lazy::new(|| {
+static RE_YMD_HMS: Lazy<Regex> = Lazy::new(|| {
     Regex::new(
         r"(?x)
   (?P<y>\d{4}) # the year
@@ -27,7 +27,19 @@ static RE: Lazy<Regex> = Lazy::new(|| {
   (?P<M>\d{2}) # the minutes
   -
   (?P<S>\d{2}) # the seconds
-  \.jpg
+",
+    )
+    .expect("regex should compile")
+});
+
+static RE_YMD: Lazy<Regex> = Lazy::new(|| {
+    Regex::new(
+        r"(?x)
+  (?P<y>\d{4}) # the year
+  -
+  (?P<m>\d{2}) # the month
+  -
+  (?P<d>\d{2}) # the day
 ",
     )
     .expect("regex should compile")
@@ -42,6 +54,95 @@ pub struct TimestampedFile {
 impl AsRef<Path> for TimestampedFile {
     fn as_ref(&self) -> &Path {
         &self.file
+    }
+}
+
+impl TimestampedFile {
+    pub fn new_ymd_hms(file: PathBuf) -> Result<Self, TimelapsifyError> {
+        let re = Lazy::force(&RE_YMD_HMS);
+
+        let file_name = file
+            .file_name()
+            .ok_or_else(|| TimelapsifyError::file_option_issue(&file))?;
+
+        let file_name_str = file_name.to_string_lossy();
+
+        let dt = if let Some(cap) = re.captures(&file_name_str) {
+            let year = cap
+                .name("y")
+                .ok_or(TimelapsifyError::RegexNoMatch)?
+                .as_str()
+                .parse()?;
+            let month = cap
+                .name("m")
+                .ok_or(TimelapsifyError::RegexNoMatch)?
+                .as_str()
+                .parse()?;
+            let day = cap
+                .name("d")
+                .ok_or(TimelapsifyError::RegexNoMatch)?
+                .as_str()
+                .parse()?;
+            let hour = cap
+                .name("H")
+                .ok_or(TimelapsifyError::RegexNoMatch)?
+                .as_str()
+                .parse()?;
+            let minutes = cap
+                .name("M")
+                .ok_or(TimelapsifyError::RegexNoMatch)?
+                .as_str()
+                .parse()?;
+            let seconds = cap
+                .name("S")
+                .ok_or(TimelapsifyError::RegexNoMatch)?
+                .as_str()
+                .parse()?;
+            Ok(Local.ymd(year, month, day).and_hms(hour, minutes, seconds))
+        } else {
+            Err(TimelapsifyError::RegexNoMatch)
+        }?;
+
+        Ok(Self {
+            file,
+            timestamp: dt,
+        })
+    }
+
+    pub fn new_ymd(file: PathBuf) -> Result<Self, TimelapsifyError> {
+        let re = Lazy::force(&RE_YMD);
+
+        let file_name = file
+            .file_name()
+            .ok_or_else(|| TimelapsifyError::file_option_issue(&file))?;
+
+        let file_name_str = file_name.to_string_lossy();
+
+        let dt = if let Some(cap) = re.captures(&file_name_str) {
+            let year = cap
+                .name("y")
+                .ok_or(TimelapsifyError::RegexNoMatch)?
+                .as_str()
+                .parse()?;
+            let month = cap
+                .name("m")
+                .ok_or(TimelapsifyError::RegexNoMatch)?
+                .as_str()
+                .parse()?;
+            let day = cap
+                .name("d")
+                .ok_or(TimelapsifyError::RegexNoMatch)?
+                .as_str()
+                .parse()?;
+            Ok(Local.ymd(year, month, day).and_hms(0, 0, 0))
+        } else {
+            Err(TimelapsifyError::RegexNoMatch)
+        }?;
+
+        Ok(Self {
+            file,
+            timestamp: dt,
+        })
     }
 }
 
@@ -143,7 +244,7 @@ async fn do_work(options: &TimelapserOptions) {
 
         let timestamped_videos = videos
             .into_iter()
-            .filter_map(|f| f.try_into().ok())
+            .filter_map(|f| TimestampedFile::new_ymd(f).ok())
             .collect::<Vec<_>>();
         if timestamped_videos.len() != num_videos {
             warn!(
@@ -276,61 +377,6 @@ impl TimelapsifyError {
     }
 }
 
-impl TryFrom<PathBuf> for TimestampedFile {
-    type Error = TimelapsifyError;
-
-    fn try_from(file: PathBuf) -> Result<Self, Self::Error> {
-        let re = Lazy::force(&RE);
-
-        let file_name = file
-            .file_name()
-            .ok_or_else(|| TimelapsifyError::file_option_issue(&file))?;
-
-        let file_name_str = file_name.to_string_lossy();
-
-        let dt = if let Some(cap) = re.captures(&file_name_str) {
-            let year = cap
-                .name("y")
-                .ok_or(TimelapsifyError::RegexNoMatch)?
-                .as_str()
-                .parse()?;
-            let month = cap
-                .name("m")
-                .ok_or(TimelapsifyError::RegexNoMatch)?
-                .as_str()
-                .parse()?;
-            let day = cap
-                .name("d")
-                .ok_or(TimelapsifyError::RegexNoMatch)?
-                .as_str()
-                .parse()?;
-            let hour = cap
-                .name("H")
-                .ok_or(TimelapsifyError::RegexNoMatch)?
-                .as_str()
-                .parse()?;
-            let minutes = cap
-                .name("M")
-                .ok_or(TimelapsifyError::RegexNoMatch)?
-                .as_str()
-                .parse()?;
-            let seconds = cap
-                .name("S")
-                .ok_or(TimelapsifyError::RegexNoMatch)?
-                .as_str()
-                .parse()?;
-            Ok(Local.ymd(year, month, day).and_hms(hour, minutes, seconds))
-        } else {
-            Err(TimelapsifyError::RegexNoMatch)
-        }?;
-
-        Ok(Self {
-            file,
-            timestamp: dt,
-        })
-    }
-}
-
 /// Look at a folder containing images.
 /// These are candidates for making a timelapse.
 ///
@@ -355,7 +401,7 @@ async fn candidates<P: AsRef<Path>>(folder: P) -> Vec<TimestampedFile> {
             continue;
         }
 
-        if let Ok(timestamped_file) = entry.path().try_into() {
+        if let Ok(timestamped_file) = TimestampedFile::new_ymd_hms(entry.path()) {
             candidates.push(timestamped_file);
         }
     }

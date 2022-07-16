@@ -3,6 +3,7 @@ use axum::{
     Extension, Router,
 };
 use std::{net::SocketAddr, path::PathBuf, sync::Arc};
+use timelapsifier::TimestampedFile;
 use tokio::sync::RwLock;
 use tower::{limit::ConcurrencyLimitLayer, ServiceBuilder};
 use tower_http::{
@@ -289,7 +290,7 @@ pub async fn main() {
     let timelapse_videos = timelapsifier::files_of_ext_in(&timelapse_output_folder, &["mp4"])
         .await
         .into_iter()
-        .filter_map(|video| video.try_into().ok())
+        .filter_map(|video| TimestampedFile::new_ymd(video).ok())
         .collect();
 
     let timelapse_options = timelapsifier::TimelapserOptions {
