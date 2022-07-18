@@ -1,7 +1,16 @@
 :root {
-  --smol: 0.5rem;
+  /* SIZES */
+  --smollest: 0.25rem;
+  --smol: calc(2 * var(--smollest));
   --normal: calc(2 * var(--smol));
   --big: calc(2 * var(--normal));
+
+  /* COLORS */
+  --green: #04aa6d;
+  --green-dark: rgba(59, 186, 129, 0.1);
+  --blue-deep: #006278;
+  --shell-bg: #def0e7c9;
+  --pink: #f8f3efc9;
 }
 
 * {
@@ -170,8 +179,11 @@ footer {
 }
 
 .component-shell {
-  background: rgb(231, 236, 226);
-  padding: 0 var(--smol);
+  background: var(--shell-bg);
+  padding: var(--smollest) var(--smol);
+  color: var(--blue-deep);
+  font-size: large;
+  font-weight: 600;
 }
 
 pre {
@@ -194,16 +206,36 @@ pre > code {
   height: auto;
 }
 
+.sidenote {
+  padding: var(--normal);
+  border-color: var(--green);
+  border-left-width: var(--smol);
+  border-left-style: groove;
+  background-color: var(--green-dark);
+}
+
+.quote {
+  padding: var(--normal);
+  border-left-width: var(--smol);
+  border-left-style: groove;
+  background-color: var(--pink);
+  font-style: italic
+}
+
+.quote-mark {
+  font-size: xx-large;
+}
+
 .component-article ul {
-  padding-left: 2rem;
+  padding-left: var(--big);
 }
 
 .component-article h2:not(:first-child) {
-  margin-top: 2rem;
+  margin-top: var(--big);
 }
 
 .component-article h3:not(:first-child) {
-  margin-top: 2rem;
+  margin-top: var(--big);
 }
 
 .center {

@@ -1,5 +1,5 @@
 use axum::{response::Html, Extension};
-use html_strong::{science_lab::NodeExt, tags::Div};
+use html_strong::science_lab::NodeExt;
 use pathdiff::diff_paths;
 use reqwest::StatusCode;
 use timelapsifier::sort_files_by_timestamp;
@@ -66,8 +66,14 @@ pub fn hello_world() -> Article {
 pub fn death_and_decay() -> Article {
     Article::new()
         .h2("Death and Decay")
-        .p("So initially I separated four glasses with basil, two inside, and two outside in the conservatory.")
-        .p("The hope was to learn something by seeing a difference between the batches. I got what I asked for. Inside top view:")
+        .p(
+            "So initially I separated four glasses with basil, two inside, and two outside in the \
+             conservatory.",
+        )
+        .p(
+            "The hope was to learn something by seeing a difference between the batches. I got \
+             what I asked for. Inside top view:",
+        )
         .image("inside-top-view.webp")
         .p("I'm not an expert but that doesn't look healthy.")
         .p("Root view:")
@@ -77,7 +83,10 @@ pub fn death_and_decay() -> Article {
         .p("Let's see what's going on outside.")
         .p("So the mother plant isn't doing so swell either:")
         .image("mother-plant.webp")
-        .p("I'm not sure if it can be salvaged but I will keep watering it until it look as decay-like as the above cuttings.")
+        .p(
+            "I'm not sure if it can be salvaged but I will keep watering it until it look as \
+             decay-like as the above cuttings.",
+        )
         .p("The two conservatory glasses contain smidgens of hope. See:")
         .image("conservatory-top-view.webp")
         .p("\"Is this hope?\", you say, and yes the leaves are concerning. But look at this:")
@@ -88,7 +97,10 @@ pub fn death_and_decay() -> Article {
         .br()
         .p("As a note the ")
         .url("https://www.youtube.com/embed/byoEBdVoVpM", "video")
-        .p(" has longer roots, and stayed in water for ~18 days. These have been in water for ~8 days. The days have been hot though, between 25 and 30 Celsius at times.")
+        .p(
+            " has longer roots, and stayed in water for ~18 days. These have been in water for ~8 \
+             days. The days have been hot though, between 25 and 30 Celsius at times.",
+        )
         .br()
         .p("Next up is putting these in soil (compost?).")
 }
@@ -96,12 +108,18 @@ pub fn death_and_decay() -> Article {
 pub fn big_changes() -> Article {
     Article::new()
         .h2("Big Changes")
-        .p("I did not have confidence in just leaving pots around in the declining temperatures in the coming months.")
+        .p(
+            "I did not have confidence in just leaving pots around in the declining temperatures \
+             in the coming months.",
+        )
         .p("So I made a plan. I bought stuff. We needed pots:")
         .image("pots.webp")
         .p("We also need some electronics. A thermometer, and power which can be set on a timer:")
         .image("thermo-timer-power.webp")
-        .p("And a bit more fancy, I got a light strip specifically made for plant growth, and a heat pad:")
+        .p(
+            "And a bit more fancy, I got a light strip specifically made for plant growth, and a \
+             heat pad:",
+        )
         .image("light-heat.webp")
         .p("We got DIRT:")
         .image("dirt.webp")
@@ -141,7 +159,10 @@ pub fn big_changes() -> Article {
         .image("cuttings-2.webp")
         .p("Let's prep a couple of pots:")
         .image("pots-dirt-leca.webp")
-        .p("My understanding is that the leca will allow water to drain faster and generally make a more aerated soil for the basil.")
+        .p(
+            "My understanding is that the leca will allow water to drain faster and generally \
+             make a more aerated soil for the basil.",
+        )
         .p("So let's add cuttings:")
         .image("plants-pot-1.webp")
         .image("plants-pot-2.webp")
@@ -156,9 +177,15 @@ pub fn big_changes() -> Article {
         .image("plants-in-gh-overview.webp")
         .p("We can hide some stuff at the bottom, neat and tidy:")
         .image("plants-in-gh-final.webp")
-        .p("That's it! Initially I turn the light strip and heatpad on for 16 hours at a time, because I read somewhere that the basil should have a natural rest.")
+        .p(
+            "That's it! Initially I turn the light strip and heatpad on for 16 hours at a time, \
+             because I read somewhere that the basil should have a natural rest.",
+        )
         .p("No clue if that's true though.")
-        .p("Anyway we have the possibility for more consistent light now, a bit higher temperature, and likely higher humidity (good? not sure).")
+        .p(
+            "Anyway we have the possibility for more consistent light now, a bit higher \
+             temperature, and likely higher humidity (good? not sure).",
+        )
         .br()
         .p("It will be fun to monitor this setup in the coming days and weeks!")
 }
@@ -167,25 +194,44 @@ pub fn seeds() -> Article {
     Article::new()
         .h2("Seeds")
         .p("I was curious to try to make basil from seeds as well.")
-        .p("And why wait to see if the cuttings pan out? If they fail and I have to start over, there will be a lot of days with not much happening. So I bought stuff.")
+        .p(
+            "And why wait to see if the cuttings pan out? If they fail and I have to start over, \
+             there will be a lot of days with not much happening. So I bought stuff.",
+        )
         .h3("Buy things")
         .image("new-buys.webp")
-        .p("Some nutrition, two packets of basil seeds (Genevese sort is what they had), and another strip of lights which can be put onto a new \"floor\" in the miniature greenhouse.")
-        .p("However, they were out of heating pads, so I will put the whole bunch in the top floor- the penthouse.")
+        .p(
+            "Some nutrition, two packets of basil seeds (Genevese sort is what they had), and \
+             another strip of lights which can be put onto a new \"floor\" in the miniature \
+             greenhouse.",
+        )
+        .p(
+            "However, they were out of heating pads, so I will put the whole bunch in the top \
+             floor- the penthouse.",
+        )
         .h3("Potting the newbies")
         .p("So first lets put dirt and leca pellets for the seeds to live in:")
         .image("pot-seeds.webp")
         .p("We water it:")
         .image("seeds-planted.webp")
-        .p("But we're trying a new scheme. We will be putting a dash of fertilizer when watering the rightmost pot of each \"category\".")
-        .p("So the rightmost cutting-pot gets a bit of fertilizer, and the same for the rightmost seeds-pot. Let's see if that makes a difference.")
+        .p(
+            "But we're trying a new scheme. We will be putting a dash of fertilizer when watering \
+             the rightmost pot of each \"category\".",
+        )
+        .p(
+            "So the rightmost cutting-pot gets a bit of fertilizer, and the same for the \
+             rightmost seeds-pot. Let's see if that makes a difference.",
+        )
         .h3("The old-timers")
         .p("So old-timer left pot has had a little whoops:")
         .image("left-pot.webp")
         .p("Is that mold? Removing that.")
         .p("Right pot is doing ok:")
         .image("right-pot.webp")
-        .p("Oh an the mother plant from the store was doing.. not great. So we pillaged mother's remains, and we will see if that produces offspring.")
+        .p(
+            "Oh an the mother plant from the store was doing.. not great. So we pillaged mother's \
+             remains, and we will see if that produces offspring.",
+        )
         .p("I'm not sure if anything from it was usable, but let's just try. In water:")
         .image("mothers-remains.webp")
         .p("They are really very short and might all die off, but then we know.")
@@ -200,7 +246,12 @@ pub async fn timelapse(
     let mut article = Article::new()
         .h2("Timelapse")
         .p("I have set up a time lapse for the herb growing.")
-        .p("This page should auto-update every night.").br().p("Currently, one timelapse is one full day. Eventually I will merge day-timelapses into longer periods.");
+        .p("This page should auto-update every night.")
+        .br()
+        .p(
+            "Currently, one timelapse is one full day. Eventually I will merge day-timelapses \
+             into longer periods.",
+        );
 
     let mut videos = videos.read().await.clone();
     sort_files_by_timestamp(&mut videos);
@@ -214,7 +265,11 @@ pub async fn timelapse(
         article = article.video(&format!("/{rel_str}"));
     }
 
-    let html = html_doc::<&'static str>(None, None, None, article.into_node());
-
-    render(Div.class("post").kid(html))
+    render(html_doc::<&'static str>(
+        "Timelapse",
+        None,
+        None,
+        None,
+        article.class("post").into_node(),
+    ))
 }

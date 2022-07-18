@@ -99,36 +99,40 @@ pub fn intro() -> Article {
             "How is global state managed? Specifically, how does logging interact with a global \
              subscriber?",
         ])
-        .h3("[Future blogpost] Practical goal: Having some fun with tracing")
-        .p("To get to grips with tracing, let's make a subscriber which does something silly.")
-        .p("Pointless small projects are my favorite type of project.")
-        .p("It would be fun to do something visual- let's not spoil too much yet.")
-        .h3("[Future blogpost] Practical goal: Making distributed traces")
-        .p(
-            "I want to know how I can make an application where I have some servers with clients \
-             talking to each server, and end up with traces which are scoped in such a way that \
-             it's easy to see what happened during each connection.",
+        .sidenote(Article::new().h3("[Future blogpost] Practical goal: Having some fun with tracing")
+            .p("To get to grips with tracing, let's make a subscriber which does something silly.")
+            .p("Pointless small projects are my favorite type of project.")
+            .p("It would be fun to do something visual- let's not spoil too much yet.")
         )
-        .p(
-            "Also, let's say we have 10 000 of the above sessions. Can I have little/no verbosity \
-             for happy connections, and higher verbosity if an error occurs in misbehaving \
-             connections?",
+        .sidenote(Article::new()
+            .h3("[Future blogpost] Practical goal: Making distributed traces")
+            .p(
+                "I want to know how I can make an application where I have some servers with clients \
+                 talking to each server, and end up with traces which are scoped in such a way that \
+                 it's easy to see what happened during each connection.",
+            )
+            .p(
+                "Also, let's say we have 10 000 of the above sessions. Can I have little/no verbosity \
+                 for happy connections, and higher verbosity if an error occurs in misbehaving \
+                 connections?",
+            )
         )
-        .h3("[Future blogpost] Goal: The relationship with OpenTelemetry")
-        .p("For having this neat overview of distributed traces, I think ")
-        .url("https://opentelemetry.io/docs/", "OpenTelemetry")
-        .p(
-            " is a good way to go about things. There seems to be some nice integrations between \
-             tracing and OpenTelemetry. But OpenTelemetry too has concepts which I know little \
-             of. So...",
+        .sidenote(Article::new().h3("[Future blogpost] Goal: The relationship with OpenTelemetry")
+            .p("For having this neat overview of distributed traces, I think ")
+            .url("https://opentelemetry.io/docs/", "OpenTelemetry")
+            .p(
+                " is a good way to go about things. There seems to be some nice integrations between \
+                 tracing and OpenTelemetry. But OpenTelemetry too has concepts which I know little \
+                 of. So...",
+            )
+            .list(vec![
+                "How does OpenTelemetry work?",
+                "How well does it map to tracing?",
+                "Which collectors should I use?",
+                "Is a collector what I think it is: The thing which receives traces? Is it very close \
+                 to being a (tracing) subscriber?",
+            ])
         )
-        .list(vec![
-            "How does OpenTelemetry work?",
-            "How well does it map to tracing?",
-            "Which collectors should I use?",
-            "Is a collector what I think it is: The thing which receives traces? Is it very close \
-             to being a (tracing) subscriber?",
-        ])
         .h2("Understanding tracing")
         .h3("The log macros")
         .p("Let's start somewhere.")
@@ -171,9 +175,9 @@ pub fn intro() -> Article {
         .p(" as a symbol name.")
         .br()
         .p("2: Here we see ")
-        .shell("tracing::<stuff>")
+        .code_inline("tracing::<stuff>")
         .p(" instead of ")
-        .shell("::tracing::<stuff>")
+        .code_inline("::tracing::<stuff>")
         .p(" which can cause issues if there is something else called ")
         .shell("tracing")
         .p(" locally. The other ")
@@ -194,7 +198,7 @@ pub fn intro() -> Article {
         .code(code["log-macros-expanded"].listing(6))
         .p("For me code instantly gets less spooky when presented like that. So I'll edit future listings to have unqualified paths.")
         .br()
-        .shell("DefaultCallsite::new(...)")
+        .code_inline("DefaultCallsite::new(...)")
         .p("wants a static reference to metadata. But it's not obvious (to me) why the callsite itself needs to be static. So why?")
         .p("Looking at the struct ")
         .url("https://docs.rs/tracing-core/latest/tracing_core/callsite/struct.DefaultCallsite.html", "definition")
@@ -205,7 +209,6 @@ pub fn intro() -> Article {
         .p("'s definition page links us to some ")
         .url("https://docs.rs/tracing-core/latest/tracing_core/callsite/index.html#", "great docs")
         .p(" about what callsites actually are. I'll summarize it.")
-        // TODO: More space around lists
         .list(vec![
             "Callsites represent locations where spans/events originate (we will look more into both)",
             "A span/event is made unique since its callsite is unique",
@@ -249,7 +252,7 @@ pub fn intro() -> Article {
         .p("Let's move a bit forward in the log macro expanded code, and check out this:")
         .code(code["log-macros-expanded"].listing(8))
         .p("So since we used the ")
-        .shell("info!(...)")
+        .code_inline("info!(...)")
         .p(" macro we see ")
         .shell("INFO")
         .p(" sprinkled here a couple times. And it's being compared against twice. What an oversight right? No- of course there's a good reason, and the hint is right there in the ")
@@ -271,24 +274,24 @@ pub fn intro() -> Article {
         .p("I think it should, but TODO check this out")
         .br()
         .p("What is ")
-        .shell("LevelFilter::current()")
+        .code_inline("LevelFilter::current()")
         .p(" then?")
-        // TODO: Quote
-        .p("\"Returns a LevelFilter that matches the most verbose Level that any currently active Subscriber will enable.\"")
+        .quote(Article::new().p("Returns a LevelFilter that matches the most verbose Level that any currently active Subscriber will enable."))
         .p("Ah, so if you have 10 subscribers at the warning level and 1 subscriber at debug, the most verbose level is debug, so that gets returned.")
         .p("Ok, so if we then used a ")
-        .shell("trace!(...)")
+        .code_inline("trace!(...)")
         .p(" call here, then that could short circuit here and do nothing.")
         .br()
         .p("Then we use the static callsite struct and call the ")
-        .shell("interest()")
-        .p("method. What does this do then? It returns one of ")
-        .shell("Interest::{never()/always()/sometimes()}")
+        .code_inline("interest()")
+        .p(" method. What does this do then? It returns one of ")
+        .code_inline("Interest::{never()/always()/sometimes()}")
         .p(". But the callsite was created a few lines ago, and we (the macro) did not pass any ")
         .shell("Interest")
         .p(" to it. I peeked at the constructor, it sets it internally to something invalid. So what will it return then?")
         .p("Peeking at the ")
-        .shell("interest()")
+        .code_inline("interest()")
+        .p(" ")
         .url("https://docs.rs/tracing-core/latest/src/tracing_core/callsite.rs.html#342-349", "source")
         .p(" shows that it goes through registration if it's in this invalid state. Cool, now we know how that is hooked up.")
         .p("And what's the TL;DR of the registration?")
@@ -300,7 +303,7 @@ pub fn intro() -> Article {
         ])
         .p("Soon done! If any subscriber might be interested (i.e. not never interested), we have another step to do.")
         .p("Lots of double underscores, so this is some very internal thing. We call ")
-        .shell("__is_enabled(CALLSITE.metadata(), interest)")
+        .code_inline("__is_enabled(CALLSITE.metadata(), interest)")
         .p( ".")
         .p("Checking the ")
         .url("https://github.com/tokio-rs/tracing/blob/tracing-0.1.35/tracing/src/lib.rs#L988", "source")
@@ -384,9 +387,8 @@ pub fn intro() -> Article {
         .p("The ")
         .shell("Arguments")
         .p(" impl explains the ")
-        // TODO: Inline code
-        .shell("Some(&::core::fmt::Arguments::new_v1(&[\"Hey\"], &[]) as &Value),")
-        .p(" which the macro produced. Does it though? ")
+        .code_inline("Some(&::core::fmt::Arguments::new_v1(&[\"Hey\"], &[]) as &Value)")
+        .p(", which the macro produced. Does it though? ")
         .shell("T::new_v1")
         .p(" is a weird thing to have exposed to users, which might explain why it ")
         .url("https://doc.rust-lang.org/beta/src/core/fmt/mod.rs.html#389", "isn't")
@@ -398,12 +400,12 @@ pub fn intro() -> Article {
         .p(", so then how is it used? This confused me, and what's worse I couldn't find any use of ")
         .shell("new_v1")
         .p(" in tracing. Then I realized the expanded macro we're seeing has expanded ")
-        .shell("format_args!(...)")
+        .code_inline("format_args!(...)")
         .p(" which IS used in tracing. So macro expansions might use macros as well, which are also expanded. It's macros all way down.")
         .br()
         .p("And the struct? Well, we saw ")
-        .shell("Some(&debug(&MyStruct { _v: 10 }) as &Value),")
-        .p(" and that produces a ")
+        .code_inline("Some(&debug(&MyStruct { _v: 10 }) as &Value)")
+        .p(", and that produces a ")
         .shell("DebugValue")
         .p(", and that can be used.")
         .br()
@@ -465,7 +467,7 @@ pub fn intro() -> Article {
         .p("Ok, that isn't that bad. Any place we would normally write ")
         .shell(".await")
         .p(" we can put ")
-        .shell(".instrument(<some span>)")
+        .code_inline(".instrument(<some span>)")
         .p(" in front and carry on with our day.")
         .p("What does it do though? The definition is so:")
         .code(code["async-span-instrument"].listing("Instrument trait"))
@@ -518,7 +520,7 @@ pub fn intro() -> Article {
         .shell("Sized")
         .p(" constraint now).")
         .p("And what's the problem with that? If you have a function that does ")
-        .shell("let i_am_small_and_big_and_both_oh_no = some_type.instrument();")
+        .code_inline("let i_am_small_and_big_and_both_oh_no = some_type.instrument();")
         .p(" the compiler can't know how big the returned type is, and then we can't create a properly sized stack for this function either.")
         .h3("Async: Solution candidate #2")
         .p("The other candidate is to use a proc macro:")
@@ -531,9 +533,9 @@ pub fn intro() -> Article {
         .p(" to the proc macro to see the effect. It's unsurprisingly passed on to the span creation macro. The docs list a number of similar things we can do to affect the other arguments passed to the span being created.")
         .br()
         .p("This solution in effect is close to the same as the previous solution, since ")
-        .shell("instrument()")
+        .code_inline("instrument()")
         .p(" is used. There is also an optimization done with ")
-        .shell(".is_disabled()")
+        .code_inline(".is_disabled()")
         .p(", which helps skip doing work when e.g. the level is more verbose than what is enabled.")
         .br()
         .p("What should you use, then? Whichever you want. I personally tend to prefer non-macro solution whenever I can, as they feel less magic to me.")
@@ -565,9 +567,9 @@ pub fn intro() -> Article {
         .p("We will fill these in soon. Using this is done like so:")
         .code(code["debugscriber"].listing("Skeleton impl use"))
         .p("But since we have ")
-        .shell("todo!()")
+        .code_inline("todo!()")
         .p("s everywhere it will crash. Can we predict in which function?")
-        .p("We expect" )
+        .p("We expect " )
         .shell("event")
         .p(" to be called at one point. But thinking back to the log macro expansion, there are checks in place to see if the event should be dispatched at all or no, based on the metadata.")
         .p("So we expect ")
@@ -575,11 +577,7 @@ pub fn intro() -> Article {
         .p(" to panic the program.")
         .br()
         .p("Running this leads to:")
-        // TODO QUOTE
-        .br()
-        .p("thread 'main' panicked at 'not yet implemented', src/bin/debugscriber.rs:8:9")
-        .p("note: run with RUST_BACKTRACE=1 environment variable to display a backtrace")
-        .br()
+        .quote(Article::new().p("thread 'main' panicked at 'not yet implemented', src/bin/debugscriber.rs:8:9") .p("note: run with RUST_BACKTRACE=1 environment variable to display a backtrace"))
         .p("Checking that line it panicked where we predicted. Let's enable the backtrace to see if we can learn anything by it.")
         .br()
         .p("Instead of dumping the backtrace, here's a summary, which solidifies our earlier investigation into the log macros.")

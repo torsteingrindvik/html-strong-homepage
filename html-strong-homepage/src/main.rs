@@ -270,16 +270,6 @@ pub async fn main() {
             Rhs::one_image("whole-family.webp"),
             herbs::basil::seeds(),
         )
-        // .post(
-        //     "timelapse",
-        //     "Timelapse",
-        //     "2022-07-14",
-        //     "Auto-updating timelapses every night!",
-        //     // TODO: Would it be cool to have a mini-timelapse here?
-        //     // (Of course it would but will we bother making that)
-        //     Rhs::Nothing,
-        //     herbs::basil::timelapse(),
-        // )
         .build();
 
     let timelapse_output_folder = PathBuf::from(format!(

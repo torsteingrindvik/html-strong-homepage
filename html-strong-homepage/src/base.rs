@@ -20,6 +20,7 @@ use crate::{Base, ContentUrl};
 ///
 /// So don't actually pass a `Body`.
 pub fn html_doc<S: AsRef<str>>(
+    title: &str,
     css: Option<Vec<S>>,
     script: Option<Vec<S>>,
     script_inline: Option<Vec<S>>,
@@ -27,6 +28,8 @@ pub fn html_doc<S: AsRef<str>>(
 ) -> Node {
     // Use html-strong's base head template.
     let mut head = template::head();
+
+    head.push_kid(Title.text(title));
 
     // Add favicon svg.
     head.push_kid(Link::icon("/favicon.ico"));

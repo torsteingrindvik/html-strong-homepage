@@ -9,6 +9,7 @@ pub enum Tidbit {
     Url { url: String, text: String },
     Image(String),
     Code(Listing),
+    CodeInline(String),
     Shell(String),
     Youtube(String),
     H2(String),
@@ -16,6 +17,8 @@ pub enum Tidbit {
     List(Vec<String>),
     Breather,
     Video(String),
+    Sidenote(Article),
+    Quote(Article),
 }
 
 #[derive(Debug, Clone)]
@@ -48,6 +51,18 @@ impl Article {
         self
     }
 
+    /// Add a visually distinct side note.
+    /// Contents are arbitrary- therefore takes an article as well.
+    pub fn quote(self, contents: Article) -> Self {
+        self.add_tidbit(Tidbit::Quote(contents))
+    }
+
+    /// Add a visually distinct side note.
+    /// Contents are arbitrary- therefore takes an article as well.
+    pub fn sidenote(self, contents: Article) -> Self {
+        self.add_tidbit(Tidbit::Sidenote(contents))
+    }
+
     /// Add paragraph text.
     pub fn p(self, text: &str) -> Self {
         self.add_tidbit(Tidbit::Text(html_escape::encode_text(text).to_string()))
@@ -62,6 +77,12 @@ impl Article {
     /// Is displayed in its own area.
     pub fn code(self, listing: Listing) -> Self {
         self.add_tidbit(Tidbit::Code(listing))
+    }
+
+    /// Adds code.
+    /// Inline- i.e. continues paragraph.
+    pub fn code_inline(self, code: &str) -> Self {
+        self.add_tidbit(Tidbit::CodeInline(code.into()))
     }
 
     /// Adds an image.
@@ -182,6 +203,14 @@ impl NodeExt for Article {
 
         for tidbit in &self.stuff {
             match tidbit {
+                Tidbit::Quote(article) => output.add_standalone(
+                    Div.class("quote breather-y rounded")
+                        .kid(Div.class("quote-mark").text("“"))
+                        .kid(article.clone()),
+                ),
+                Tidbit::Sidenote(article) => {
+                    output.add_standalone(article.clone().class("sidenote breather-y rounded"))
+                }
                 Tidbit::Url { url, text } => {
                     output.continue_paragraph(ParagraphContent::kid(A::href(url).text(text)));
                 }
@@ -207,6 +236,10 @@ impl NodeExt for Article {
                         .kid(source)
                         .class("rounded breather-y width-100")
                 }),
+                Tidbit::CodeInline(code) => output.continue_paragraph(ParagraphContent::Kid(
+                    Code.class("rust-inline rounded")
+                        .text(html_escape::encode_text(code)),
+                )),
                 Tidbit::Code(code) => {
                     output.add_standalone(code.clone());
                 }
@@ -234,7 +267,7 @@ impl NodeExt for Article {
                     for text in text_list {
                         list.push_kid(Li.text(text));
                     }
-                    output.add_standalone(list)
+                    output.add_standalone(list.class("breather-y"))
                 }
                 Tidbit::Breather => output.add_standalone(Br),
             };

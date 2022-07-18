@@ -164,14 +164,15 @@ struct Context {
     pub url: &'static str,
 }
 
-async fn render_page(node: Node) -> Result<Html<String>, (StatusCode, String)> {
+async fn render_page(title: &str, node: Node) -> Result<Html<String>, (StatusCode, String)> {
     let html = html_doc(
+        title,
         Some(vec![
             // For highlight.js
             "/static/css/shared/monokai.min.css",
         ]),
-        Some(vec!["/static/js/highlight.min.js"]),
-        Some(vec!["hljs.highlightAll();"]),
+        Some(vec!["/static/js/highlight.min.js", "/static/js/shared.js"]),
+        None,
         node,
     );
 
@@ -193,7 +194,7 @@ async fn page(Extension(state): Extension<Page>) -> Result<Html<String>, (Status
         content.push_kid(series.card.clone().class("breather-y"));
     }
 
-    render_page(content.into_node()).await
+    render_page(&state.context.title, content.into_node()).await
 }
 
 async fn series(
@@ -206,7 +207,7 @@ async fn series(
         for post in series.posts().iter().rev() {
             content.push_kid(post.card.clone().class("breather-y"));
         }
-        render_page(content.into_node()).await
+        render_page(&series_path, content.into_node()).await
     } else {
         Err(no_such_page(series_path).await)
     }
@@ -217,7 +218,7 @@ async fn post(
     Extension(state): Extension<Page>,
 ) -> Result<Html<String>, (StatusCode, String)> {
     if let Some(post) = state.post(&series_path, &post_path) {
-        render_page(Div.class("post").kid(post.contents.clone().into_node())).await
+        render_page(&post_path, Div.class("post").kid(post.contents.clone().into_node())).await
     } else {
         Err(no_such_page(format!("{series_path}/{post_path}")).await)
     }
