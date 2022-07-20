@@ -6,6 +6,40 @@ use timelapsifier::sort_files_by_timestamp;
 
 use crate::{base::html_doc, common::render, components::Article};
 
+pub async fn timelapse(
+    Extension(videos): Extension<timelapsifier::StateVideos>,
+) -> Result<Html<String>, (StatusCode, String)> {
+    let mut article = Article::new()
+        .h2("Timelapse")
+        .p("I have set up a time lapse for the herb growing.")
+        .p("This page should auto-update every night.")
+        .br()
+        .p(
+            "Currently, one timelapse is one full day. Eventually I will merge day-timelapses \
+             into longer periods.",
+        );
+
+    let mut videos = videos.read().await.clone();
+    sort_files_by_timestamp(&mut videos);
+
+    for video in videos.iter().rev() {
+        let rel = diff_paths(video, env!("CARGO_MANIFEST_DIR")).expect("a relative path");
+        let rel_str = rel.to_str().expect("relative path ok");
+
+        let video_name = rel.file_stem().expect("file name ok");
+        article = article.h3(video_name.to_str().expect("file name ok"));
+        article = article.video(&format!("/{rel_str}"));
+    }
+
+    render(html_doc::<&'static str>(
+        "Timelapse",
+        None,
+        None,
+        None,
+        article.class("post").into_node(),
+    ))
+}
+
 pub fn hello_world() -> Article {
     Article::new()
         .h2("Hello World")
@@ -240,36 +274,24 @@ pub fn seeds() -> Article {
         .image("whole-family.webp")
 }
 
-pub async fn timelapse(
-    Extension(videos): Extension<timelapsifier::StateVideos>,
-) -> Result<Html<String>, (StatusCode, String)> {
-    let mut article = Article::new()
-        .h2("Timelapse")
-        .p("I have set up a time lapse for the herb growing.")
-        .p("This page should auto-update every night.")
+pub fn pruning() -> Article {
+    Article::new()
+        .h2("Pruning")
+        .p("As far as I understand it, pruning basil makes more leaves grow and can generally make the basil healthier.")
+        .p("What does not kill basil, makes more basil.")
+        .p("When should you do this? Not sure. But my understanding is that if it has more than 2-3 nodes with leaves, you can go for it.")
+        .p("Here is what they look like now:")
+        .image("prune-1.webp")
+        .image("prune-2.webp")
+        .image("prune-3.webp")
+        .image("prune-4.webp")
+        .image("prune-5.webp")
+        .p("I realized not all of these fit the bill.")
+        .p("I trimmed some of these and got just a mini-harvest:")
+        .image("done.webp")
+        .p("Such a pretty color on these!")
         .br()
-        .p(
-            "Currently, one timelapse is one full day. Eventually I will merge day-timelapses \
-             into longer periods.",
-        );
-
-    let mut videos = videos.read().await.clone();
-    sort_files_by_timestamp(&mut videos);
-
-    for video in videos.iter().rev() {
-        let rel = diff_paths(video, env!("CARGO_MANIFEST_DIR")).expect("a relative path");
-        let rel_str = rel.to_str().expect("relative path ok");
-
-        let video_name = rel.file_stem().expect("file name ok");
-        article = article.h3(video_name.to_str().expect("file name ok"));
-        article = article.video(&format!("/{rel_str}"));
-    }
-
-    render(html_doc::<&'static str>(
-        "Timelapse",
-        None,
-        None,
-        None,
-        article.class("post").into_node(),
-    ))
+        .p("But the most interesting thing now is that I have an auto-updating ")
+        .url("https://torste.in/timelapse", "timelapse")
+        .p(" going, with a currently subpar webcam. So now I can see how the basil grows with a little update each day!")
 }

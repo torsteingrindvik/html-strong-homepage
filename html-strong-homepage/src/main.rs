@@ -2,6 +2,7 @@ use axum::{
     routing::{get, get_service},
     Extension, Router,
 };
+use chrono::{Local, TimeZone};
 use std::{net::SocketAddr, path::PathBuf, sync::Arc};
 use timelapsifier::TimestampedFile;
 use tokio::sync::RwLock;
@@ -100,7 +101,7 @@ pub async fn main() {
     .post(
         "overview",
         "Overview",
-        "2022-todo-todo",
+        Local.ymd(1999, 1, 1),
         "Hello world/tracing! Let's get an overview of what tracing is and why we'd want to use \
          it.",
         Rhs::Nothing,
@@ -135,7 +136,7 @@ pub async fn main() {
     .post(
         "hello-world",
         "Hello lowpoly character world!",
-        "2022-06-15",
+        Local.ymd(2022, 06, 15),
         "Starting out this tutorial, let's see how far we get.",
         Rhs::one_image("adding-objects.webp"),
         blender::low_poly_characters::hello_world(),
@@ -143,7 +144,7 @@ pub async fn main() {
     .post(
         "simple-character",
         "Simple character",
-        "2022-06-16",
+        Local.ymd(2022, 06, 16),
         "Making simple blocky characters.",
         Rhs::one_image("cool-character.webp"),
         blender::low_poly_characters::simple_character(),
@@ -151,7 +152,7 @@ pub async fn main() {
     .post(
         "block-characters",
         "Block Characters",
-        "2022-06-18",
+        Local.ymd(2022, 06, 18),
         "Using reference images to trace some slightly more advanced characters.",
         Rhs::one_image("trace-leg.webp"),
         blender::low_poly_characters::block_characters(),
@@ -159,7 +160,7 @@ pub async fn main() {
     .post(
         "cyborg",
         "Cyborg",
-        "2022-06-23",
+        Local.ymd(2022, 06, 23),
         "Having some fun, creating a cyborg!",
         Rhs::one_image("cyborg.webp"),
         blender::low_poly_characters::cyborg(),
@@ -167,7 +168,7 @@ pub async fn main() {
     .post(
         "cyborg-follow-up",
         "Cyborg Follow-Up",
-        "2022-07-03",
+        Local.ymd(2022, 07, 03),
         "Let's finish up the cyborg with some emissive materials.",
         Rhs::one_image("cyborg-lights.webp"),
         blender::low_poly_characters::cyborg_follow_up(),
@@ -190,7 +191,7 @@ pub async fn main() {
     .post(
         "galpin-huberman-podcast",
         "Strength, Muscle Size & Endurance",
-        "So how does one grow?",
+        Local.ymd(2022, 06, 04),
         "Dr. Andy Galpin: How to Build Strength, Muscle Size & Endurance | Huberman Lab Podcast \
          #65",
         Rhs::Nothing,
@@ -199,7 +200,7 @@ pub async fn main() {
     .post(
         "eating-for-hypertrophy",
         "Eating for Hypertrophy",
-        "So how does one eat?",
+        Local.ymd(2022, 06, 04),
         "A 5 minute video by Andy Galpin.",
         Rhs::Nothing,
         training::eating_for_hypertrophy(),
@@ -207,7 +208,7 @@ pub async fn main() {
     .post(
         "new-science-of-muscle-hypertrophy-1",
         "New Science of Muscle Hypertrophy 1",
-        "So how do you grow literally?",
+        Local.ymd(2022, 06, 04),
         "A long series by Dr. Andy Galpin. Episode theme: Physiology.",
         Rhs::Nothing,
         training::new_science_of_muscle_hypertrophy_1(),
@@ -215,7 +216,7 @@ pub async fn main() {
     .post(
         "new-science-of-muscle-hypertrophy-2",
         "New Science of Muscle Hypertrophy 2",
-        "How do you signal the start of growth?",
+        Local.ymd(2022, 06, 04),
         "A long series by Dr. Andy Galpin. Episode theme: Stimuli.",
         Rhs::Nothing,
         training::new_science_of_muscle_hypertrophy_2(),
@@ -223,7 +224,7 @@ pub async fn main() {
     .post(
         "new-science-of-muscle-hypertrophy-3",
         "New Science of Muscle Hypertrophy 3",
-        "What do you eat?",
+        Local.ymd(2022, 06, 04),
         "A long series by Dr. Andy Galpin. Episode theme: Eating and training.",
         Rhs::Nothing,
         training::new_science_of_muscle_hypertrophy_3(),
@@ -241,7 +242,7 @@ pub async fn main() {
         .post(
             "hello-world",
             "Starting out",
-            "2022-06-23",
+            Local.ymd(2022, 06, 23),
             "Starting out basil growth from a store bought mother plant.",
             Rhs::one_image("pesto.webp"),
             herbs::basil::hello_world(),
@@ -249,7 +250,7 @@ pub async fn main() {
         .post(
             "death-and-decay",
             "Death and Decay",
-            "2022-07-02",
+            Local.ymd(2022, 07, 02),
             "And... hope?",
             Rhs::one_image("mother-plant.webp"),
             herbs::basil::death_and_decay(),
@@ -257,7 +258,7 @@ pub async fn main() {
         .post(
             "big-changes",
             "Big Changes",
-            "2022-07-07",
+            Local.ymd(2022, 07, 07),
             "We spend money and things happen.",
             Rhs::one_image("plants-filled.webp"),
             herbs::basil::big_changes(),
@@ -265,10 +266,18 @@ pub async fn main() {
         .post(
             "seeds",
             "Seeds",
-            "2022-07-09",
+            Local.ymd(2022, 07, 09),
             "We spend money and other things happen.",
             Rhs::one_image("whole-family.webp"),
             herbs::basil::seeds(),
+        )
+        .post(
+            "pruning",
+            "Pruning",
+            Local.ymd(2022, 07, 16),
+            "Let's cut down things.",
+            Rhs::one_image("done.webp"),
+            herbs::basil::pruning(),
         )
         .build();
 
@@ -303,8 +312,24 @@ pub async fn main() {
 
     let (herbs_new_image, herbs_new_image_router) = herbs::timelapsify_init(timelapse_options);
 
+    let mut all_posts = vec![&blog, &blender, &training, &herbs]
+        .iter()
+        .flat_map(|page| {
+            page.posts()
+                .iter()
+                .map(|post| post.lead())
+                .collect::<Vec<_>>()
+        })
+        .collect::<Vec<_>>();
+    all_posts.sort_by_key(|post| post.date);
+
+    let all_posts = Arc::new(all_posts);
+
     let app = Router::new()
-        .route(&content_home.url(), get(home::home))
+        .route(
+            &content_home.url(),
+            get(home::home).layer(Extension(all_posts)),
+        )
         .nest(blog.url(), blog.router())
         .nest(blender.url(), blender.router())
         .nest(training.url(), training.router())

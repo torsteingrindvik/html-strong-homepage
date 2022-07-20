@@ -1,4 +1,5 @@
 use axum::{extract::Path, response::Html, routing::get, Extension, Router};
+use chrono::{Date, Local};
 use html_strong::{document_tree::Node, science_lab::NodeExt, tags::*};
 use reqwest::StatusCode;
 use std::sync::Arc;
@@ -50,19 +51,19 @@ impl Rhs {
 #[derive(Debug, Clone)]
 pub struct Card {
     /// Card title.
-    title: String,
+    pub title: String,
 
     /// Displayed in a less prominent manner than the title.
-    subtitle: String,
+    pub subtitle: String,
 
     /// Card description.
-    description: String,
+    pub description: String,
 
     /// Url to go to when card is clicked.
-    url: String,
+    pub url: String,
 
     /// What do display on the right hand side of the card.
-    rhs: Rhs,
+    pub rhs: Rhs,
 }
 
 impl Card {
@@ -116,20 +117,40 @@ impl NodeExt for Card {
             Rhs::Nothing => card_contents.class("grid-2"),
         };
 
-        Div.class("card-bg padding rounded ease link-reset")
+        Div.class("card-bg padding rounded ease link-reset soft-shadow")
             .kid(card.kid(card_contents))
     }
 }
 
 #[derive(Debug, Clone)]
-struct Post {
-    card: Card,
-    contents: Article,
+pub struct Post {
+    pub card: Card,
+    pub contents: Article,
+    pub date: Date<Local>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PostLead {
+    pub date: Date<Local>,
+    pub title: String,
+    pub url: String,
 }
 
 impl Post {
-    pub fn new(card: Card, contents: Article) -> Self {
-        Self { card, contents }
+    pub fn new(card: Card, date: Date<Local>, contents: Article) -> Self {
+        Self {
+            card,
+            contents,
+            date,
+        }
+    }
+
+    pub fn lead(&self) -> PostLead {
+        PostLead {
+            date: self.date,
+            title: self.card.title.clone(),
+            url: self.card.url.clone(),
+        }
     }
 }
 
@@ -218,7 +239,11 @@ async fn post(
     Extension(state): Extension<Page>,
 ) -> Result<Html<String>, (StatusCode, String)> {
     if let Some(post) = state.post(&series_path, &post_path) {
-        render_page(&post_path, Div.class("post").kid(post.contents.clone().into_node())).await
+        render_page(
+            &post_path,
+            Div.class("post").kid(post.contents.clone().into_node()),
+        )
+        .await
     } else {
         Err(no_such_page(format!("{series_path}/{post_path}")).await)
     }
@@ -227,6 +252,16 @@ async fn post(
 #[derive(Debug, Clone)]
 pub struct Page {
     context: Arc<Context>,
+}
+
+impl Page {
+    pub fn posts(&self) -> Vec<&Post> {
+        self.context
+            .series
+            .iter()
+            .flat_map(|serie| serie.posts())
+            .collect()
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -271,7 +306,7 @@ impl PageBuilder {
         mut self,
         url: &str,
         title: &str,
-        subtitle: &str,
+        date: Date<Local>,
         description: &str,
         mut rhs: Rhs,
         mut contents: Article,
@@ -291,8 +326,11 @@ impl PageBuilder {
         // Note: The url already has a leading slash.
         contents.url_prefix = Some(static_url);
 
+        let subtitle = date.format("%Y-%m-%d").to_string();
+
         current_series.posts.push(Post::new(
-            Card::new(title, subtitle, description, &url, rhs),
+            Card::new(title, &subtitle, description, &url, rhs),
+            date,
             contents,
         ));
         self

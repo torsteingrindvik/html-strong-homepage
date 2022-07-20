@@ -511,8 +511,7 @@ pub fn intro() -> Article {
         .code(code["async-span-instrument"].listing("Instrument method"))
         .p("If we don't, the compiler helpfully notes:")
         .br()
-        // TODO: Quote
-        .p("\"the size for values of type Self cannot be known at compilation time\"")
+        .quote(Article::new().p("the size for values of type Self cannot be known at compilation time"))
         .br()
         .p("Since the trait needs to work for any ")
         .shell("Self")
@@ -594,8 +593,7 @@ pub fn intro() -> Article {
         .p("We'll talk about all the functions. First, let's run it via this:")
         .code(code["debugscriber2"].listing("Printing subscriber use"))
         .p("Running that gives us:")
-        // TODO: Shell multiline
-        .code(code["debugscriber2"].listing("DbgScriber output"))
+        .shell_multiline("code/tracing-explore/src/bin/debugscriber2.txt")
         .p("A few things to notice here.")
         .list(vec![
             "Checking if a callsite is enabled is cached, as it does not happen the second loop iteration",

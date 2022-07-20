@@ -1,7 +1,34 @@
+use std::path::{Path, PathBuf};
+
 use html_strong::{document_tree::Node, science_lab::NodeExt, tags::*};
-use tracing::error;
+use tracing::{error, debug};
 
 use crate::listing::Listing;
+
+#[derive(Debug)]
+pub struct ShellMultiline(pub String);
+
+impl From<&str> for ShellMultiline {
+    fn from(text: &str) -> Self {
+        ShellMultiline(text.to_string())
+    }
+}
+
+impl From<&Path> for ShellMultiline {
+    fn from(file: &Path) -> Self {
+        debug!(?file, "Reading file for shell multiline");
+        let text = std::fs::read_to_string(file).expect("should be able to read file");
+
+        ShellMultiline(text)
+    }
+}
+
+impl From<PathBuf> for ShellMultiline {
+    fn from(file: PathBuf) -> Self {
+        file.as_path().into()
+    }
+}
+
 
 #[derive(Debug, Clone)]
 pub enum Tidbit {
@@ -11,6 +38,7 @@ pub enum Tidbit {
     Code(Listing),
     CodeInline(String),
     Shell(String),
+    ShellMultiline(String),
     Youtube(String),
     H2(String),
     H3(String),
@@ -100,6 +128,13 @@ impl Article {
     /// This adds an inline shell-like command.
     pub fn shell(self, command: &str) -> Self {
         self.add_tidbit(Tidbit::Shell(html_escape::encode_text(command).to_string()))
+    }
+
+    /// Add a separate area with shell output over several lines.
+    pub fn shell_multiline<P: AsRef<Path>>(self, file_with_output: P) -> Self {
+        let shell_multiline: ShellMultiline = file_with_output.as_ref().into();
+
+        self.add_tidbit(Tidbit::ShellMultiline(html_escape::encode_text(&shell_multiline.0).to_string()))
     }
 
     /// This adds an inline url.
@@ -247,6 +282,12 @@ impl NodeExt for Article {
                     output.continue_paragraph(ParagraphContent::kid(
                         Code.class("component-shell rounded").text(command),
                     ));
+                }
+                Tidbit::ShellMultiline(commands) => {
+                    output.add_standalone(
+                        Pre.class("component-shell-multiline rounded breather-y")
+                            .text(commands),
+                    );
                 }
                 Tidbit::Text(text) => {
                     if output.last_was_p {

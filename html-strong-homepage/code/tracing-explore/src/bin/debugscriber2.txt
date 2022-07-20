@@ -1,0 +1,17 @@
+[enabled?]: INFO I'm your parent
+[new_span]: INFO I'm your parent
+[enter]: Id(469222052677789482)
+[enabled?]: INFO event src/bin/debugscriber2.rs:91
+[event]: INFO event src/bin/debugscriber2.rs:91 message=Hi!
+[enabled?]: WARN Danger zone
+[new_span]: WARN Danger zone bah=0
+[record_follows_from]: Id(10469711387276112522) follows Id(469222052677789482)
+[record]: Id(10469711387276112522) oh=0
+[enabled?]: INFO event src/bin/debugscriber2.rs:98
+[event]: INFO event src/bin/debugscriber2.rs:98 message=Hi, but more wary
+[event]: INFO event src/bin/debugscriber2.rs:91 message=Hi!
+[new_span]: WARN Danger zone bah=1
+[record_follows_from]: Id(10469711387276112522) follows Id(469222052677789482)
+[record]: Id(10469711387276112522) oh=2
+[event]: INFO event src/bin/debugscriber2.rs:98 message=Hi, but more wary
+[exit]: Id(469222052677789482)
