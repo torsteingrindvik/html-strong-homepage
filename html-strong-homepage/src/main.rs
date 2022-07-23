@@ -173,6 +173,14 @@ pub async fn main() {
         Rhs::one_image("cyborg-lights.webp"),
         blender::low_poly_characters::cyborg_follow_up(),
     )
+    .post(
+        "more-folks",
+        "More folks!",
+        Local.ymd(2022, 07, 23),
+        "Course finished! More folks created, also texturing via UV editing and some rigging.",
+        Rhs::one_image("pose.webp"),
+        blender::low_poly_characters::more_folks(),
+    )
     .build();
 
     let training = page::PageBuilder::new(
