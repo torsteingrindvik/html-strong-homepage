@@ -154,14 +154,20 @@ pub fn more_folks() -> Article {
         .h2("Final post: More folks")
         .p("More character creation and texturing inbound!")
         .h3("Basic characters")
-        .p("The course provided some references, where we do what we did in previous lessons, which is to line up the reference images and try to recreate what we see.")
+        .p(
+            "The course provided some references, where we do what we did in previous lessons, \
+             which is to line up the reference images and try to recreate what we see.",
+        )
         .p("We start out around the torso:")
         .image("early-torso.webp")
         .p("The result of that is:")
         .image("man-done.webp")
         .p("And a female variant:")
         .image("both-done.webp")
-        .p("And the tip from the instructor is to copy-paste these when creating new characters instead of starting from scratch.")
+        .p(
+            "And the tip from the instructor is to copy-paste these when creating new characters \
+             instead of starting from scratch.",
+        )
         .p("Creating a few extra weirdos leads to:")
         .image("weird-bunch.webp")
         .p("Which was pretty fun.")
@@ -174,12 +180,19 @@ pub fn more_folks() -> Article {
         .p("Then we give him some basic materials assigned:")
         .image("big-guy-basic-materials.webp")
         .p("But wait! What if there is a better way than manually using materials and slots?")
-        .p("We are introduced to UV editing. Using a super small texture (10x10 pixels of distinct colors!) we learn to map the faces of the 3D model to that texture.")
+        .p(
+            "We are introduced to UV editing. Using a super small texture (10x10 pixels of \
+             distinct colors!) we learn to map the faces of the 3D model to that texture.",
+        )
         .p("In blender that looks like:")
         .image("uv-map.webp")
         .p("When starting out the mapping is colorful but nonsensical.")
         .image("texture-atlas.webp")
-        .p("A nice trick was to mark edges in the 3D model with seams, which lets you select entire regions of the 3D model and map all those faces in the texture at the same time.")
+        .p(
+            "A nice trick was to mark edges in the 3D model with seams, which lets you select \
+             entire regions of the 3D model and map all those faces in the texture at the same \
+             time.",
+        )
         .p("So after mapping out everything we get:")
         .image("uv-map-done.webp")
         .p("Fun!")
@@ -190,22 +203,37 @@ pub fn more_folks() -> Article {
         .image("pose.webp")
         .p("That concludes the big guy.")
         .h3("Anime grill")
-        .p("The procedure was similar here. Start out with the basic female 3D model, use reference images, adapt mesh as well as we can.")
+        .p(
+            "The procedure was similar here. Start out with the basic female 3D model, use \
+             reference images, adapt mesh as well as we can.",
+        )
         .image("grill-untextured.webp")
         .p("Now we do the UV mapping, and behold:")
         .image("final-destination.webp")
         .h3("Course done")
-        .p("We did it! This concludes the first course I've ever finished start to end in Blender. Feels good!")
-        .p("I learned enough to feel comfortable with a lot of basics, so when doing more courses I can more easily power through the start-phase more quickly.")
+        .p(
+            "We did it! This concludes the first course I've ever finished start to end in \
+             Blender. Feels good!",
+        )
+        .p(
+            "I learned enough to feel comfortable with a lot of basics, so when doing more \
+             courses I can more easily power through the start-phase more quickly.",
+        )
         .br()
         .p("Maybe it's more useful to note what I'm not good at yet.")
         .list(vec![
-            "The rigging part was a bit finicky, and this course did not focus on that. A separate course would be good.",
-            "Debugging things that go wrong, like overlapping geometry and such. Good tips learned: Merging vertices, overlay which shows normals.",
-            "Remembering important things like normalizing scale, rotation, 3D origin before going into rigging.",
+            "The rigging part was a bit finicky, and this course did not focus on that. A \
+             separate course would be good.",
+            "Debugging things that go wrong, like overlapping geometry and such. Good tips \
+             learned: Merging vertices, overlay which shows normals.",
+            "Remembering important things like normalizing scale, rotation, 3D origin before \
+             going into rigging.",
             "Lighting. I just put lights at random locations until the render looks decent.",
             "Node editor, here we know only the very basics.",
             "This course relied heavily on good reference images. What would we do without them?",
         ])
-        .p("All in all a great course, even though I'm not super interested in low poly humanoid characters.")
+        .p(
+            "All in all a great course, even though I'm not super interested in low poly humanoid \
+             characters.",
+        )
 }

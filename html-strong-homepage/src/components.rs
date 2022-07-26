@@ -1,7 +1,7 @@
 use std::path::{Path, PathBuf};
 
 use html_strong::{document_tree::Node, science_lab::NodeExt, tags::*};
-use tracing::{error, debug};
+use tracing::{debug, error};
 
 use crate::listing::Listing;
 
@@ -28,7 +28,6 @@ impl From<PathBuf> for ShellMultiline {
         file.as_path().into()
     }
 }
-
 
 #[derive(Debug, Clone)]
 pub enum Tidbit {
@@ -134,7 +133,9 @@ impl Article {
     pub fn shell_multiline<P: AsRef<Path>>(self, file_with_output: P) -> Self {
         let shell_multiline: ShellMultiline = file_with_output.as_ref().into();
 
-        self.add_tidbit(Tidbit::ShellMultiline(html_escape::encode_text(&shell_multiline.0).to_string()))
+        self.add_tidbit(Tidbit::ShellMultiline(
+            html_escape::encode_text(&shell_multiline.0).to_string(),
+        ))
     }
 
     /// This adds an inline url.

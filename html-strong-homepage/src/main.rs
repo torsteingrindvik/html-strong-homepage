@@ -126,6 +126,14 @@ pub async fn main() {
         "A stylized tutorial by Grant Abbitt on creating low polygon count landscapes.",
         Rhs::two_images("after-the-mirror-modifier.webp", "goal.webp"),
     )
+    .post(
+        "hello-landscapes",
+        "Cabin",
+        Local.ymd(2022, 07, 26),
+        "We get quite far by finishing the cabin of this tutorial.",
+        Rhs::one_image("cabin-done.webp"),
+        blender::low_poly_landscapes::hello_world(),
+    )
     .series(
         "low-poly-characters",
         "Low Poly Characters",

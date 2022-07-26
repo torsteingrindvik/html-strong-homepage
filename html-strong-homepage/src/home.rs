@@ -53,7 +53,14 @@ impl NodeExt for PostLeadTable {
             let date = post_lead.date.format("%Y-%m-%d").to_string();
 
             // URL in post is e.g. /herbs/basil/pruning
-            let category: String = post_lead.url.split("/").into_iter().skip(1).take(2).collect::<Vec<&str>>().join("/");
+            let category: String = post_lead
+                .url
+                .split("/")
+                .into_iter()
+                .skip(1)
+                .take(2)
+                .collect::<Vec<&str>>()
+                .join("/");
 
             let title = post_lead.title;
             let url = post_lead.url;

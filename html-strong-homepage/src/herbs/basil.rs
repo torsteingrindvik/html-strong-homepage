@@ -277,9 +277,15 @@ pub fn seeds() -> Article {
 pub fn pruning() -> Article {
     Article::new()
         .h2("Pruning")
-        .p("As far as I understand it, pruning basil makes more leaves grow and can generally make the basil healthier.")
+        .p(
+            "As far as I understand it, pruning basil makes more leaves grow and can generally \
+             make the basil healthier.",
+        )
         .p("What does not kill basil, makes more basil.")
-        .p("When should you do this? Not sure. But my understanding is that if it has more than 2-3 nodes with leaves, you can go for it.")
+        .p(
+            "When should you do this? Not sure. But my understanding is that if it has more than \
+             2-3 nodes with leaves, you can go for it.",
+        )
         .p("Here is what they look like now:")
         .image("prune-1.webp")
         .image("prune-2.webp")
@@ -293,5 +299,8 @@ pub fn pruning() -> Article {
         .br()
         .p("But the most interesting thing now is that I have an auto-updating ")
         .url("https://torste.in/timelapse", "timelapse")
-        .p(" going, with a currently subpar webcam. So now I can see how the basil grows with a little update each day!")
+        .p(
+            " going, with a currently subpar webcam. So now I can see how the basil grows with a \
+             little update each day!",
+        )
 }
