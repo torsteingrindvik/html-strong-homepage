@@ -134,6 +134,14 @@ pub async fn main() {
         Rhs::one_image("cabin-done.webp"),
         blender::low_poly_landscapes::hello_world(),
     )
+    .post(
+        "bye-landscapes",
+        "Everything",
+        Local.ymd(2022, 08, 02),
+        "We finish the tutorial.",
+        Rhs::one_image("color-early.webp"),
+        blender::low_poly_landscapes::bye_world(),
+    )
     .series(
         "low-poly-characters",
         "Low Poly Characters",
