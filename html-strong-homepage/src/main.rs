@@ -120,6 +120,21 @@ pub async fn main() {
          learning Blender too seriously.",
     )
     .series(
+        "misc",
+        "Misc",
+        "Small things here and there",
+        "Props, testing stuff, small chill projects.",
+        Rhs::Nothing
+    )
+    .post(
+        "mushrooms",
+        "Mushrooms",
+        Local.ymd(2022, 08, 21),
+        "I learned texture painting and thus I make mushrooms.",
+        Rhs::one_image("start.webp"),
+        blender::misc::mushrooms(),
+    )
+    .series(
         "low-poly-landscapes",
         "Low Poly Landscapes",
         "I love this style!",

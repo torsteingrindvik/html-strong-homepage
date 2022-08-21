@@ -14,6 +14,8 @@ fn main() -> Result<()> {
         .filter(|f| {
             f.extension().and_then(|ext| ext.to_str()) == Some("png".into())
                 || f.extension().and_then(|ext| ext.to_str()) == Some("jpg".into())
+                || f.extension().and_then(|ext| ext.to_str()) == Some("PNG".into())
+                || f.extension().and_then(|ext| ext.to_str()) == Some("JPG".into())
         })
         // If it's already converted, don't do it again
         .filter(|f| !f.with_extension("webp").exists())
